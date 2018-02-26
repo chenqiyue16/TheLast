@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+  
+  <head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.0</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="/static/css/font.css">
+    <link rel="stylesheet" href="/static/css/xadmin.css">
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+      <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  
+  <body>
+    <div class="x-nav">
+      <span class="layui-breadcrumb">
+        <a href="">首页</a>
+        <a href="">演示</a>
+        <a>
+          <cite>导航元素</cite></a>
+      </span>
+      <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
+        <i class="layui-icon" style="line-height:30px">ဂ</i></a>
+    </div>
+    <xblock>
+      学生信息查询
+
+      </xblock>
+      <hr/>
+		<form class="layui-form layui-col-md12 x-so" actaction="" method="">
+          身份证号：<input id="addw"   type="text" name="studentid" lay-verify="required" placeholder="" autocomplete="off" class="layui-input" style="margin-right: 5em">
+          <input value="添加" class="layui-btn" lay-submit lay-filter="add" style="width:20%;" type="submit">
+		</form>
+	<form class="layui-form layui-col-md12 x-so" method="post" action="/company/shanchustudent/">
+        {% csrf_token %}
+      <table class="layui-table">
+        <thead>
+          <tr>
+            <th style="text-align:center"><input type="submit" value="删除" class="layui-btn layui-btn-danger" lay-submit lay-filter="shanchu"></th>
+            </th>
+            <th style="text-align:center";>学号</th>
+            <th  style="text-align:center">姓名</th>
+            <th style="text-align:center">学院</th>
+            <th  style="text-align:center">专业</th>
+            <th style="text-align:center">年级</th>
+            <th style="text-align:center">学历</th>
+            <th style="text-align:center">状态</th>
+
+        </thead>
+        <tbody>
+        {% for student in students%}
+          <tr>
+              <td>
+              <input type="checkbox" name="student_list"  lay-skin="primary" value="{{student.u_id}}">
+
+            </td>
+            <td>{{student.u_id}}</td>
+            <td>{{student.u_name}}</td>
+            <td>{{student.u_xueyuan}}</td>
+            <td>{{student.u_zhuanye}}</td>
+            <td>{{student.u_nianji}}</td>
+            <td>{{student.u_xueli}}</td>
+            <td class="td-status">
+              <span class="layui-btn layui-btn-normal layui-btn-mini">{{student.u_status}}</span></td>
+            <td class="td-manage">
+
+
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </form>
+    <div class="x-body">
+      <div class="layui-row">
+          <form class="layui-form layui-col-md12 x-so" method="post" action="/company/sss">
+       <blockquote class="layui-elem-quote">甲方信息填写</blockquote>
+        
+          用人单位名称：<input type="text" name="companyname" lay-verify="required" placeholder="请输入用户名" autocomplete="off" class="layui-input" style="margin-right: 5em">
+          单位隶属：<input type="text" name="companylishu"  placeholder="请输入用户名" autocomplete="off" class="layui-input" style="margin-right: 5em">
+          联系人：<input type="text" name="companylianxiren"  placeholder="请输入用户名" autocomplete="off" class="layui-input" style="margin-right: 5em">
+          <hr class="hr15"/>
+			
+          组织机构代码：<input type="text" name="companynumber"  placeholder="请输入用户名" autocomplete="off" class="layui-input" style="margin-right: 5em">
+          联系电话：<input type="text" name="companyphone"  placeholder="请输入用户名" autocomplete="off" class="layui-input" style="margin-right: 5em">
+		  e-mail：<input type="text" name="companyemail"  placeholder="请输入用户名" autocomplete="off" class="layui-input" style="margin-right: 5em">
+         <hr class="hr15"/>
+          通信地址：<input type="text" name="companyaddress"  placeholder="请输入用户名" autocomplete="off" class="layui-input" style="margin-right: 5em">
+          邮政编码：<input type="text" name="companyyoubian" id="youbian" placeholder="请输入用户名" autocomplete="off" class="layui-input" style="margin-right: 5em">
+          单位性质：
+          <div style="margin-right: 2em" class="layui-input-inline">
+          	<select name="companyxingzhi" style="width:5em"><option value="1">已签约</option><option value="2">已签约</option><option value="3">已签约</option></select>
+          </div>
+          <hr class="hr15"/>
+
+          单位行业：
+          <div  class="layui-input-inline" style="margin-right: 6em">
+          	<select name="companyhangye" style="width:5em"><option value="1">已签约</option></select>
+          </div>
+          职位类别：
+          <div  class="layui-input-inline" style="margin-right: 3em">
+          	<select name="companyleibie" style="width:5em"><option value="1">已签约</option></select>
+          </div>
+          档案接收情况：
+          
+          <div class="layui-input-inline" style="margin-right: 1em" >
+          <select id="selectDangan" lay-filter="level"><option value="0">----------</option><option value="1">用人单位接收档案</option><option value="2">学生自行解决户档</option></select>
+          </div>
+         <hr class="hr15"/>
+		<div id="dangan" style="display:none">
+		  档案接收部门：<input class="layui-input" placeholder="开始日" name="start1" style="margin-right: 2em;">
+          档案接收单位名称：<input class="layui-input" placeholder="开始日" name="start2" style="margin-right: 1em;">
+          档案接收详细地址：<input class="layui-input" placeholder="开始日" name="start3" style="margin-right: 3em;">
+          <hr class="hr15"/>
+          档案接收邮政编码：<input class="layui-input" placeholder="开始日" name="start4" style="margin-right: 2em;">
+          档案接收收件人：<input class="layui-input" placeholder="开始日" name="start5" style="margin-right: 1em;">
+          档案接收联系电话：<input class="layui-input" placeholder="开始日" name="start6" style="margin-right: 3em;">
+       </div>
+       <input value="邀约" class="layui-btn" lay-submit lay-filter="yaoyue" style="width:20%;" type="submit">
+        </form>
+      </div>
+
+    </div>
+	</body>
+    <script>
+	layui.use('form',function(){
+		var form = layui.form;
+
+
+		form.on('submit(add)', function(data){
+		var txt_value = $('#addw').val();
+
+		layer.confirm('您是如何看待前端开发？', {
+		  btn: ['重要','奇葩'] //按钮
+		}, function(){
+		  layer.msg('的确很重要', {icon: 1});
+		  alert(txt_value);
+		  $.ajax({
+				type:"POST",
+				url:"/company/addstudent/",
+				data:{studentid:txt_value, csrfmiddlewaretoken: '{{ csrf_token  }}'},
+				dataType:"json",
+				success:function (data) {
+                    window.location.reload();
+            	}
+			});
+		}, function(){
+
+		});
+	  console.log(data.elem) //被执行事件的元素DOM对象，一般为button对象
+	  console.log(data.form) //被执行提交的form对象，一般在存在form标签时才会返回
+	  console.log(data.field) //当前容器的全部表单字段，名值对形式：{name: value}
+	  return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+	});
+
+
+		form.on('submit(yaoyue)', function(data){
+			layer.alert('内容');
+
+		});
+
+        form.on('submit(shanchu)', function(data){
+
+
+		});
+
+		form.on('select(level)', function(data){
+			if(data.value==1){
+				$("#dangan").show();
+			}
+			else{
+				$("#dangan").hide();
+			}
+
+		});
+	});
+      layui.use('laydate', function(){
+        var laydate = layui.laydate;
+        
+        //执行一个laydate实例
+        laydate.render({
+          elem: '#start' //指定元素
+        });
+
+        //执行一个laydate实例
+        laydate.render({
+          elem: '#end' //指定元素
+        });
+      });
+	
+		
+		
+		
+		
+	
+		
+		
+		
+
+       /*用户-停用*/
+      function member_stop(obj,id){
+          layer.confirm('确认要停用吗？',function(index){
+
+              if($(obj).attr('title')=='启用'){
+
+                //发异步把用户状态进行更改
+                $(obj).attr('title','停用')
+                $(obj).find('i').html('&#xe62f;');
+
+                $(obj).parents("tr").find(".td-status").find('span').addClass('layui-btn-disabled').html('已停用');
+                layer.msg('已停用!',{icon: 5,time:1000});
+
+              }else{
+                $(obj).attr('title','启用')
+                $(obj).find('i').html('&#xe601;');
+
+                $(obj).parents("tr").find(".td-status").find('span').removeClass('layui-btn-disabled').html('已启用');
+                layer.msg('已启用!',{icon: 5,time:1000});
+              }
+              
+          });
+      }
+
+      /*用户-删除*/
+      function member_del(obj,id){
+
+          layer.confirm('确认要删除吗？',function(index){
+              //发异步删除数据
+              $(obj).parents("tr").remove();
+              layer.msg('已删除!',{icon:1,time:1000});
+          });
+      }
+
+
+
+      function delAll (argument) {
+
+        var data = tableCheck.getData();
+  
+        layer.confirm('确认要删除吗？'+data,function(index){
+            //捉到所有被选中的，发异步进行删除
+            layer.msg('删除成功', {icon: 1});
+            $(".layui-form-checked").not('.header').parents('tr').remove();
+        });
+      }
+    </script>
+    <script>var _hmt = _hmt || []; (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?b393d153aeb26b46e9431fabaf0f6190";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+      })();</script>
+  </body>
+
+</html>
