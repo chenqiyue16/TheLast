@@ -84,19 +84,30 @@
     <div class="x-body">
       <div class="layui-row">
           <form class="layui-form layui-col-md12 x-so" method="post" action="/company/sss">
+        <blockquote class="layui-elem-quote">签约信息填写</blockquote>
+              签约有效天数：<input type="text" name="qianyuetianshu" lay-verify="required" placeholder="" autocomplete="off" class="layui-input" style="margin-right: 5em">
+          工作地点：<input type="text" lay-verify="required" name="gongzuodidian"  placeholder="" autocomplete="off" class="layui-input" style="margin-right: 5em">
+          到岗报到地址：<input lay-verify="required" type="text" name="baodaodizhi"  placeholder="" autocomplete="off" class="layui-input" style="margin-right: 5em">
+          <hr class="hr15"/>
+              到岗报到时间：<input lay-verify="date"  type="text" name="baodaoshijian" lay-verify="required" placeholder="" autocomplete="off" class="layui-input" style="margin-right: 5em">
+          试用期限：<input  type="text" name="shiyongqixian"  placeholder="" autocomplete="off" class="layui-input" style="margin-right: 5em">
+          转正后薪水：<input type="text" name="zhuanzhengxinshui"  placeholder="" autocomplete="off" class="layui-input" style="margin-right: 5em">
+          <hr class="hr15"/>
+                        其他情况约定：<input type="text" name="companyname"  autocomplete="off" class="layui-input" style="margin-right: 5em;width: 50em;">
+
        <blockquote class="layui-elem-quote">甲方信息填写</blockquote>
         
-          用人单位名称：<input type="text" name="companyname" lay-verify="required" placeholder="请输入用户名" autocomplete="off" class="layui-input" style="margin-right: 5em">
-          单位隶属：<input type="text" name="companylishu"  placeholder="请输入用户名" autocomplete="off" class="layui-input" style="margin-right: 5em">
-          联系人：<input type="text" name="companylianxiren"  placeholder="请输入用户名" autocomplete="off" class="layui-input" style="margin-right: 5em">
+          用人单位名称：<input type="text" name="companyname" lay-verify="required" placeholder="" autocomplete="off" class="layui-input" style="margin-right: 5em">
+          单位隶属：<input type="text" name="companylishu"  lay-verify="required" placeholder="" autocomplete="off" class="layui-input" style="margin-right: 5em">
+          联系人：<input type="text" name="companylianxiren" lay-verify="required" placeholder="" autocomplete="off" class="layui-input" style="margin-right: 5em">
           <hr class="hr15"/>
 			
-          组织机构代码：<input type="text" name="companynumber"  placeholder="请输入用户名" autocomplete="off" class="layui-input" style="margin-right: 5em">
-          联系电话：<input type="text" name="companyphone"  placeholder="请输入用户名" autocomplete="off" class="layui-input" style="margin-right: 5em">
-		  e-mail：<input type="text" name="companyemail"  placeholder="请输入用户名" autocomplete="off" class="layui-input" style="margin-right: 5em">
+          组织机构代码：<input type="text" name="companynumber" lay-verify="required" placeholder="" autocomplete="off" class="layui-input" style="margin-right: 5em">
+          联系电话：<input type="text" name="companyphone" lay-verify="phone" placeholder="" autocomplete="off" class="layui-input" style="margin-right: 5em">
+		  e-mail：<input type="text" name="companyemail" lay-verify="email" placeholder="" autocomplete="off" class="layui-input" style="margin-right: 5em">
          <hr class="hr15"/>
-          通信地址：<input type="text" name="companyaddress"  placeholder="请输入用户名" autocomplete="off" class="layui-input" style="margin-right: 5em">
-          邮政编码：<input type="text" name="companyyoubian" id="youbian" placeholder="请输入用户名" autocomplete="off" class="layui-input" style="margin-right: 5em">
+          通信地址：<input type="text" name="companyaddress" lay-verify="required" placeholder="" autocomplete="off" class="layui-input" style="margin-right: 5em">
+          邮政编码：<input type="text" name="companyyoubian" lay-verify="number" id="youbian" placeholder="" autocomplete="off" class="layui-input" style="margin-right: 5em">
           单位性质：
           <div style="margin-right: 2em" class="layui-input-inline">
           	<select name="companyxingzhi" style="width:5em"><option value="1">已签约</option><option value="2">已签约</option><option value="3">已签约</option></select>
@@ -114,7 +125,7 @@
           档案接收情况：
           
           <div class="layui-input-inline" style="margin-right: 1em" >
-          <select id="selectDangan" lay-filter="level"><option value="0">----------</option><option value="1">用人单位接收档案</option><option value="2">学生自行解决户档</option></select>
+          <select id="selectDangan" lay-filter="level"><option value="0">学生自行解决户档</option><option value="1">用人单位接收档案</option></select>
           </div>
          <hr class="hr15"/>
 		<div id="dangan" style="display:none">
@@ -260,6 +271,6 @@
         var s = document.getElementsByTagName("script")[0];
         s.parentNode.insertBefore(hm, s);
       })();</script>
-  </body>
+
 
 </html>

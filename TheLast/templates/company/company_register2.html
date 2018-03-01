@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>后台系统管理</title>
+	<meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="/static/css/font.css">
+	<link rel="stylesheet" href="/static/css/xadmin.css">
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+</head>
+<body class="login-bg">
+   	<div class="login" style="width: 100em; height: 65em">
+   	<div class="message">信息注册</div>
+        <div id="darkbannerwrap"></div>
+    	<form class="layui-form layui-col-md12 x-so" action="/company/registerhandle/" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+          单位隶属：<input type="text" name="danweilishu" lay-verify="required" placeholder="" autocomplete="off" class="layui-input"  style="width: 20em">
+
+          <hr class="hr18">
+          联系人：&nbsp;&nbsp;&nbsp;<input type="text" name="lianxiren" lay-verify="required" placeholder="" autocomplete="off" class="layui-input" style="width: 20em">
+
+          <hr class="hr18">
+          联系电话：<input type="text" name="lianxidianhua" lay-verify="phone" placeholder="" autocomplete="off" class="layui-input" style="width: 20em">
+
+          <hr class="hr18">
+          电子邮箱：<input type="text" name="email" lay-verify="email" placeholder="" autocomplete="off" class="layui-input" style="width: 20em">
+
+          <hr class="hr18">
+          单位性质：
+          <div  class="layui-input-inline" style="width:20em;margin-right: 3em">
+          
+          	<select  name="danweixingzhi" style="width:20em;" ><option value="1">已签约</option><option value="2">已签约</option><option value="3">已签约</option></select>
+          </div>
+           <hr class="hr13">
+          单位行业：
+          <div  class="layui-input-inline" style="width:20em;margin-right: 3em">
+          	<select name="danweihangye" style="width:20em;"><option value="1">已签约</option><option value="2">已签约</option><option value="3">已签约</option></select>
+          </div>
+
+           <hr class="hr15">
+          通信地址：<input type="text" name="tongxindizhi" lay-verify="required" placeholder="" autocomplete="off" class="layui-input" style="width: 20em">
+          <hr class="hr15">
+          <hr class="hr15">营业执照打印、拍照上传：<input type="file" name="zhizhao" lay-verify="required" placeholder="" autocomplete="off" class="layui-input" >
+          <hr class="hr15">
+			<input value="注册" lay-submit lay-filter="register" style="width:100%;" type="submit">
+          
+		</form>
+	</div>
+    
+</body>
+<script>
+    layui.use('form',function(){
+		var form = layui.form;
+        form.on('submit(register)', function(data){
+
+
+		});
+
+
+	});
+
+
+
+</script>
+</html>

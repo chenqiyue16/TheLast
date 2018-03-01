@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  
+  <head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.0</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="/static/css/font.css">
+    <link rel="stylesheet" href="/static/css/xadmin.css">
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+      <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  
+  <body>
+    <div class="x-nav">
+      <span class="layui-breadcrumb">
+        <a href="">首页</a>
+        <a href="">个人中心</a>
+        <a>
+          <cite>信息修改</cite></a>
+      </span>
+      <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
+        <i class="layui-icon" style="line-height:30px">ဂ</i></a>
+    </div>
+      <hr/>
+		
+	
+      
+    
+    <div class="x-body">
+      <div class="layui-row">
+      <form class="layui-form layui-col-md12 x-so">
+       <blockquote class="layui-elem-quote">企业信息修改</blockquote>
+        
+          用人单位名称：<input type="text" name="danweimingcheng" lay-verify="required" value="{{company.c_danweimingcheng}}" autocomplete="off" class="layui-input" style="margin-right: 5em">
+          单位隶属：<input type="text" name="danweilishu" lay-verify="required" value="{{company.c_danweilishu}}" autocomplete="off" class="layui-input" style="margin-right: 5em">
+          联系人：<input type="text" name="lianxiren" lay-verify="required" value="{{company.c_lianxiren}}" autocomplete="off" class="layui-input" style="margin-right: 5em">
+          <hr class="hr15"/>
+			
+          组织机构代码：<input type="text" name="zuzhijigoudaima" lay-verify="required"  value="{{company.c_zuzhijigoudaima}}" autocomplete="off" class="layui-input" style="margin-right: 5em">
+          联系电话：<input type="text" name="lianxidianhua" lay-verify="required"  value="{{company.c_lianxidianhua}}" autocomplete="off" class="layui-input" style="margin-right: 5em">
+		  e-mail：<input type="text" name="email"  lay-verify="required"  value="{{company.c_youxiang}}" autocomplete="off" class="layui-input" style="margin-right: 5em">
+         <hr class="hr15"/>
+          通信地址：<input type="text" name="tongxindizhi" lay-verify="required"  value="{{company.c_tongxindizhi}}" autocomplete="off" class="layui-input" style="margin-right: 5em">
+
+          单位性质：
+          <div style="margin-right: 2em" class="layui-input-inline">
+          	<select style="width:5em" ><option value="1">已签约</option><option value="2">已签约</option><option value="3">已签约</option></select>
+		  </div>
+          <hr class="hr15"/>
+
+          单位行业：
+          <div  class="layui-input-inline" style="margin-right: 6em">
+          	<select style="width:5em"><option value="1">已签约</option></select>
+          </div>
+
+           <hr class="hr15"/>
+          
+       <input value="修改信息" class="layui-btn" lay-submit lay-filter="xiugai" style="width:20%;" type="submit">
+        </form>
+      </div>
+		
+    </div>
+	</body>
+   
+    <script>
+	layui.use('form',function(){
+		var form = layui.form;
+		form.on('submit(xiugai)', function(data){
+			layer.alert('内容');
+		});
+		
+	});
+	
+
+    </script>
+    <script>var _hmt = _hmt || []; (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?b393d153aeb26b46e9431fabaf0f6190";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+      })();</script>
+
+
+</html>
