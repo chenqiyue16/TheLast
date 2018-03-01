@@ -70,8 +70,63 @@ def company_welcome(request):
 
 def company_yaoyue(request):
     students = LinshiInfo.objects.all()
-    context = {'students': students}
-    return render(request,'company/company_yaoyue.html', context)
+    id = request.session.get('u_id')
+    if id != '':
+        companys = CompanyInfo.objects.filter(id=id)
+        company = companys[0]
+        context = {'students': students, 'company': company}
+        return render(request, 'company/company_yaoyue.html', context)
+    else:
+        redirect('/company/login/')
+
+
+def company_yaoyue_handle(request):
+
+    qianyuegangwei = request.POST.get('qianyuegangwei')
+    youxiaotianshu = request.POST.get('qianyuetianshu')
+    gongzuodidian = request.POST.get('gongzuodidian')
+    baodaodizhi = request.POST.get('baodaodizhi')
+    baodaoshijian = request.POST.get('baodaoshijian')
+    shiyongqixian = request.POST.get('shiyongqixian')
+    zhuanzhengxinshui = request.POST.get('zhuanzhengxinshui')
+    qita = request.POST.get('qita')
+    zhiweileibie = request.POST.get('zhiweileibie')
+    danganjieshou = request.POST.get('danganjieshou', None)
+
+    students = LinshiInfo.objects.all()
+    for student in students:
+        qianyue = QianyueInfo()
+        qianyue.q_youxiaotianshu = youxiaotianshu
+        qianyue.q_gongzuodidian = gongzuodidian
+        qianyue.q_baodaodizhi = baodaodizhi
+        qianyue.q_baodaoshijian = baodaoshijian
+        qianyue.q_shiyongqixian = shiyongqixian
+        qianyue.q_zhuanzhengxinshui = zhuanzhengxinshui
+        qianyue.q_qita = qita
+        qianyue.q_gangwei = qianyuegangwei
+        qianyue.q_zhiweileibie = zhiweileibie
+        qianyue.q_danganjieshou = danganjieshou
+
+        if danganjieshou != None:
+            jieshoubumen = request.POST.get('jieshoubumen')
+            jieshoudanwei = request.POST.get('jieshoudanwei')
+            jieshoudizhi = request.POST.get('jieshoudizhi')
+            jieshouyoubian = request.POST.get('jieshouyoubian')
+            jieshouren = request.POST.get('jieshouren')
+            jieshoudianhua = request.POST.get('jieshoudianhua')
+            qianyue.q_jieshoubumen = jieshoubumen
+            qianyue.q_jieshoudanweimingcheng = jieshoudanwei
+            qianyue.q_jieshouxiangxidizhi = jieshoudizhi
+            qianyue.q_jieshouyoubian = jieshouyoubian
+            qianyue.q_jieshouren = jieshouren
+            qianyue.q_jieshoudianhua = jieshoudianhua
+        qianyue.q_student_id = student.u_id
+        qianyue.q_company_id = request.session.get('u_id')
+        qianyue.save()
+    LinshiInfo.objects.filter(u_company_id=request.session.get('u_id')).delete()
+    return redirect('/company/chakan/')
+
+
 
 
 def test(request):
@@ -223,20 +278,26 @@ def company_info(request):
 def company_addstudent(request):
     studentid = request.POST.get('studentid', None)
     print(studentid)
-    students = StudentInfo.objects.filter(u_identyid=str(studentid))
-    print(students[0])
-    student = LinshiInfo()
-    print(student)
-    student.u_id = students[0].u_id
-    student.u_name = students[0].u_name
-    student.u_xueyuan = students[0].u_xueyuan
-    student.u_nianji = students[0].u_nianji
-    student.u_xueli = students[0].u_xueli
-    student.u_zhuanye = students[0].u_zhuanye
-    student.u_status = students[0].u_status
-    student.u_identyid = students[0].u_identyid
-    print('u_name')
-    print(student.u_name)
-    student.save()
-    return HttpResponse(json.dumps({"u_id": student.u_id, "u_name": student.u_name, "u_xueyuan": student.u_xueyuan
-                                    , "u_nianji": student.u_nianji, "u_xueli": student.u_xueli, "u_zhuanye": student.u_zhuanye}))
+    id =request.session.get('u_id', None)
+    if studentid != None and id != None:
+        stlinshi = LinshiInfo.objects.filter(u_identyid=studentid)
+        if stlinshi.exists():
+            return HttpResponse(json.dumps({"msg": '此人您已发出邀约！'}))
+        else:
+            students = StudentInfo.objects.filter(u_identyid=str(studentid))
+            student = LinshiInfo()
+            student.u_id = students[0].u_id
+            student.u_name = students[0].u_name
+            student.u_xueyuan = students[0].u_xueyuan
+            student.u_nianji = students[0].u_nianji
+            student.u_xueli = students[0].u_xueli
+            student.u_zhuanye = students[0].u_zhuanye
+            student.u_status = students[0].u_status
+            student.u_identyid = students[0].u_identyid
+            student.u_company_id = str(id)
+            student.save()
+            print('u_name')
+            print(student.u_name)
+            print(student)
+            return HttpResponse(json.dumps({"msg": '添加成功'}))
+    return redirect('/company/login/')

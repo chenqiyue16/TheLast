@@ -24,6 +24,7 @@ class LinshiInfo(models.Model):
     u_nianji = models.CharField(max_length=10)
     u_xueli = models.CharField(max_length=10)
     u_status = models.CharField(max_length=5)
+    u_company = models.ForeignKey('company.CompanyInfo')
 
 
 class QianyueStudent(models.Model):

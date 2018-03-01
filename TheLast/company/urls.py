@@ -6,7 +6,6 @@ urlpatterns = [
     url(r'^login/$', views.company_login),
     url(r'^login_handle/$', views.login_handle),
 
-    url(r'^welcome/$', views.company_welcome),
     url(r'^yaoyue/$', views.company_yaoyue),
     url(r'^addstudent/$', views.company_addstudent),
     url(r'^chaxunstudent/$', views.company_chaxunstudent),
@@ -19,5 +18,6 @@ urlpatterns = [
     url(r'^registerhandle/$', views.company_registerhandle),
     url(r'^weishenhe/$', views.company_weishenhe),
     url(r'^weishenhe_xiugai/$', views.company_weishenhe_xiugai),
-    url(r'^company_info/$', views.company_info)
+    url(r'^company_info/$', views.company_info),
+    url(r'^yaoyue_handle/$', views.company_yaoyue_handle)
 ]
