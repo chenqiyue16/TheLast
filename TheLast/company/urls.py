@@ -19,5 +19,9 @@ urlpatterns = [
     url(r'^weishenhe/$', views.company_weishenhe),
     url(r'^weishenhe_xiugai/$', views.company_weishenhe_xiugai),
     url(r'^company_info/$', views.company_info),
-    url(r'^yaoyue_handle/$', views.company_yaoyue_handle)
+    url(r'^yaoyue_handle/$', views.company_yaoyue_handle),
+    url(r'^chaxun/(\d*)$', views.company_chaxun),
+    url(r'^chaxun/(\d+)/$', views.company_chaxun),
+    url(r'^chaxun_xiangxixinxi_(\d+)/$', views.company_chaxun_xiangxixinxi),
+    url(r'^chaxun_sousuo/$', views.company_chaxun_sousuo),
 ]

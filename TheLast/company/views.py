@@ -1,6 +1,7 @@
 from django.shortcuts import render,redirect
 from .models import *
 from student.models import LinshiInfo, StudentInfo
+from django.core.paginator import Paginator
 from hashlib import sha1
 from django.http import HttpResponse, HttpResponseRedirect
 import json
@@ -301,3 +302,85 @@ def company_addstudent(request):
             print(student)
             return HttpResponse(json.dumps({"msg": '添加成功'}))
     return redirect('/company/login/')
+
+
+def company_chaxun(request, pIndex):
+
+    id = request.session.get('u_id', None)
+    if id != None:
+        students = QianyueInfo.objects.filter(q_company_id=id).values('q_student_id', 'q_student_id__u_name',
+                                                                      'q_student_id__u_identyid'
+                                                                      , 'q_student_id__u_xueyuan', 'q_student_id__u_zhuanye'
+                                                                      , 'q_student_id__u_nianji', 'q_student_id__u_xueli'
+                                                                      , 'q_qianyuezhuangtai')
+
+        p = Paginator(students, 1)
+        if pIndex == '':
+            pIndex = 1
+        pIndex = int(pIndex)
+        list2 = p.page(pIndex)
+        plist = p.page_range
+        context = {'plist': plist, 'students': list2, 'pindex': pIndex}
+
+        return render(request, 'company/company_chaxun.html', context)
+    else:
+        return redirect('/company/login/')
+
+
+def company_chaxun_xiangxixinxi(request, id):
+    qianyue = QianyueInfo.objects.filter(q_student_id=id)
+    students = StudentInfo.objects.filter(u_id=id)
+    identyid = students[0].u_identyid
+    name = students[0].u_name
+    context = {'qianyue': qianyue[0], 'name': name, 'identyid': identyid}
+    return render(request, 'company/company_chaxun_xiangxixinxi.html', context)
+
+
+def company_chaxun_sousuo(request):
+    queryset = {}
+    kwargs = {}
+    id = request.session.get('u_id')
+    print(id)
+    queryset['u_name'] = request.POST.get('u_name', None)
+    queryset['u_id'] = request.POST.get('u_id', None)
+    queryset['u_identyid'] = request.POST.get('u_identyid', None)
+    queryset['u_xueyuan'] = request.POST.get('u_xueyuan', None)
+    queryset['u_zhuanye'] = request.POST.get('u_zhuanye', None)
+    queryset['u_xueli'] = request.POST.get('u_xueli', None)
+    queryset['FAN1__q_qianyuezhuangtai'] = request.POST.get('u_qianyuezhuangtai', None)
+    queryset['FAN1__q_danganjieshou'] = request.POST.get('u_danganjieshou', None)
+    queryset['FAN1__q_company_id'] = id
+    for (k, v) in queryset.items():
+        if v != '':
+            kwargs[k] = v
+    print(kwargs)
+    try:
+        students = StudentInfo.objects.filter(**kwargs)
+    except StudentInfo.DoesNotExist:
+        print('Does Not Exist')
+    for student in students:
+        print(student)
+
+    qianyues = QianyueInfo.objects.filter(q_student_id=student.u_id)
+    tests = zip(students, qianyues)
+    context = {'tests': tests}
+    return render(request, 'company/company_chaxun_sousuo.html', context)
+    # if u_name != None
+    #     if u_id != None:
+    #         if u_identyid != None:
+    #             if u_xueyuan != None:
+    #                 if u_zhuanye != None:
+    #                     if u_xueli != None:
+    #                         if u_qianyuezhuangtai !=None:
+    #                             if u_danganjieshou != None:
+    #                                 pass #全不为None
+    #                             elif u_danganjieshou ==None:
+    #                                 pass #档案接收不为None
+    #                         elif u_qianyuezhuangtai ==None:
+    #                     elif u_xueli ==None:
+    #                 elif u_zhuanye ==None:
+    #             elif u_xueyuan == None:
+    #         elif u_identyid == None:
+    #     elif u_id == None:
+    # elif u_name == None:
+

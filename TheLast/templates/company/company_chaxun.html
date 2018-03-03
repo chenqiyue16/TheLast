@@ -33,94 +33,121 @@
     </div>
     <div class="x-body">
       <div class="layui-row">
-        <form class="layui-form layui-col-md12 x-so">
-          学生姓名：<input class="layui-input" placeholder="开始日" name="start" id="start" style="margin-right: 5em">
-          学号：<input class="layui-input" placeholder="截止日" name="end" id="end" style="margin-right: 5em">
-          学院：<input class="layui-input" placeholder="截止日" name="end" id="end" style="margin-right: 5em">
+        <form class="layui-form layui-col-md12 x-so" action="/company/chaxun_sousuo/" method="post">
+          学生姓名：<input type="text" name="u_name"  placeholder="姓名查询" autocomplete="off" class="layui-input" style="margin-right: 5em">
+          学号：<input type="text" name="u_id"  placeholder="学号查询" autocomplete="off" class="layui-input" style="margin-right: 5em">
+          学院：<input type="text" name="u_xueyuan"  placeholder="学院查询" autocomplete="off" class="layui-input" style="margin-right: 5em">
           <hr class="hr15">
+            {% csrf_token %}
+          身份证号：<input type="text" name="u_identyid"  placeholder="身份证号查询" autocomplete="off" class="layui-input" style="margin-right: 5em">
+          专业：<input type="text" name="u_zhuanye"  placeholder="专业查询" autocomplete="off" class="layui-input" style="margin-right: 5em">
+          学历：
+          <div style="margin-right: 5em" class="layui-input-inline">
+              <select name="u_xueli">
+                    <option></option>
+                    <option value="大学本科">大学本科</option>
+                    <option value="硕士研究生">硕士研究生</option>
+              </select>
+          </div>
+          <hr class="hr15">
+          签约状态：
+          <div style="margin-right: 5em" class="layui-input-inline">
+              <select name="u_qianyuezhuangtai">
+                    <option></option>
+                    <option value="1">已签约</option>
+                    <option value="-1">被拒绝</option>
+                    <option value="0">已邀约</option>
 
-          毕业年份：<input type="text" name="username"  placeholder="请输入用户名" autocomplete="off" class="layui-input" style="margin-right: 5em">
-          专业：<input class="layui-input" placeholder="开始日" name="start" id="start" style="margin-right: 5em">
-		  学历：<div style="margin-right: 5em" class="layui-input-inline"><select><option value="1">本科</option></select></div>
-          <hr class="hr15">
-          签约状态：<div style="margin-right: 5em" class="layui-input-inline"><select><option value="1">已签约</option></select></div>
+              </select>
+          </div>
+            档案接收：
+          <div style="margin-right: 5em" class="layui-input-inline">
+              <select name="u_danganjieshou">
+                    <option></option>
+
+                    <option value="0">学生自行解决户档</option>
+                    <option value="1">用人单位接收档案</option>
+
+              </select>
+          </div>
           
-          查询<button class="layui-btn"  lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i></button>
+          <button class="layui-btn layui-btn-primary" lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i>查询</button>
         </form>
       </div>
       <xblock>
-        <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon"></i>批量删除</button>
-        <button class="layui-btn" onclick="x_admin_show('添加用户','./admin-add.html')"><i class="layui-icon"></i>添加</button>
-        <span class="x-right" style="line-height:40px">共有数据：88 条</span>
+
+        当前邀约学生管理
       </xblock>
       <table class="layui-table">
         <thead>
           <tr>
-            <th>
-              <div class="layui-unselect header layui-form-checkbox" lay-skin="primary"><i class="layui-icon">&#xe605;</i></div>
-            </th>
-            <th>ID</th>
-            <th>登录名</th>
-            <th>手机</th>
-            <th>邮箱</th>
-            <th>角色</th>
-            <th>加入时间</th>
-            <th>状态</th>
-            <th>操作</th>
+
+            <th style="text-align:center";>学号</th>
+            <th  style="text-align:center">姓名</th>
+             <th  style="text-align:center">身份证号</th>
+            <th style="text-align:center">学院</th>
+            <th  style="text-align:center">专业</th>
+            <th style="text-align:center">年级</th>
+            <th style="text-align:center">学历</th>
+            <th style="text-align:center">状态</th>
+              <th style="text-align:center">操作</th>
         </thead>
         <tbody>
+        {% for student in students%}
           <tr>
-            <td>
-              <div class="layui-unselect layui-form-checkbox" lay-skin="primary" data-id='2'><i class="layui-icon">&#xe605;</i></div>
-            </td>
-            <td>1</td>
-            <td>admin</td>
-            <td>18925139194</td>
-            <td>113664000@qq.com</td>
-            <td>超级管理员</td>
-            <td>2017-01-01 11:11:42</td>
-            <td class="td-status">
-              <span class="layui-btn layui-btn-normal layui-btn-mini">已启用</span></td>
-            <td class="td-manage">
-              <a onclick="member_stop(this,'10001')" href="javascript:;"  title="启用">
+              <td align="center">{{student.q_student_id}}</td>
+                <td align="center" >{{student.q_student_id__u_name}}</td>
+                <td align="center">{{student.q_student_id__u_identyid}}</td>
+                <td align="center">{{student.q_student_id__u_xueyuan}}</td>
+                <td align="center">{{student.q_student_id__u_zhuanye}}</td>
+                <td align="center">{{student.q_student_id__u_nianji}}</td>
+                <td align="center">{{student.q_student_id__u_xueli}}</td>
+                <td align="center" class="td-status">
+                    {% if student.q_qianyuezhuangtai == 0%}
+                 <span class="layui-btn layui-btn-normal layui-btn-mini">已邀约</span></td>
+                    {% endif %}
+                    {% if student.q_qianyuezhuangtai == 1%}
+                 <span class="layui-btn layui-btn layui-btn-mini">已签约</span></td>
+                    {% endif %}
+                    {% if student.q_qianyuezhuangtai == -1%}
+                 <span class="layui-btn layui-btn-danger layui-btn-mini">已拒绝</span></td>
+                    {% endif %}
+              <td class="td-manage" align="center">
+              <a title="查看详细信息" onclick="x_admin_show('个人信息','/company/chaxun_xiangxixinxi_{{student.q_student_id}}/')">
                 <i class="layui-icon">&#xe601;</i>
               </a>
-              <a title="编辑"  onclick="x_admin_show('编辑','admin-edit.html')" href="javascript:;">
-                <i class="layui-icon">&#xe642;</i>
-              </a>
-              <a title="删除" onclick="member_del(this,'要删除的id')" href="javascript:;">
-                <i class="layui-icon">&#xe640;</i>
-              </a>
             </td>
+
           </tr>
+        {% endfor %}
         </tbody>
       </table>
       <div class="page">
         <div>
-          <a class="prev" href="">&lt;&lt;</a>
-          <a class="num" href="">1</a>
-          <span class="current">2</span>
-          <a class="num" href="">3</a>
-          <a class="num" href="">489</a>
-          <a class="next" href="">&gt;&gt;</a>
+
+            {% if students.has_previous%}
+            <a class="prev" href="/company/chaxun/{{students.previous_page_number}}/">&lt;&lt;</a>
+            {%endif%}
+            {%for pindex in plist%}
+
+            {%if pIndex == pindex%}
+            <span class="current">{{pindex}}</span>
+            {%else%}
+            <a class="num" href="/company/chaxun/{{pindex}}/">{{pindex}}</a>
+            {% endif %}
+            {%endfor%}
+
+
+            {% if students.has_next%}
+            <a class="next" href="/company/chaxun/{{students.next_page_number}}/">&gt;&gt;</a>
+            {%endif%}
+
         </div>
       </div>
 
     </div>
     <script>
-      layui.use('laydate', function(){
-        var laydate = layui.laydate;
-        
-        //执行一个laydate实例
-        laydate.render({
-          elem: '#start' //指定元素
-        });
 
-        //执行一个laydate实例
-        laydate.render({
-          elem: '#end' //指定元素
-        });
-      });
 
        /*用户-停用*/
       function member_stop(obj,id){
