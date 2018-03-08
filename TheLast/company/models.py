@@ -30,7 +30,7 @@ class QianyueInfo(models.Model):
     q_qita = models.CharField(null=True,blank=True,max_length=100)
     q_gangwei = models.CharField(max_length=25)
     q_zhiweileibie = models.CharField(max_length=20)
-    q_danganjieshou = models.BooleanField(default=False)
+    q_danganjieshou = models.IntegerField(default=False)
     q_jieshoubumen = models.CharField(null=True, blank=True, max_length=20)
     q_jieshoudanweimingcheng = models.CharField(null=True, blank=True, max_length=20)
     q_jieshouxiangxidizhi = models.CharField(null=True, blank=True, max_length=50)

@@ -10,7 +10,7 @@
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="/static/css/font.css">
     <link rel="stylesheet" href="/static/css/xadmin.css">
-    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/dist/jquery-3.3.1.js"></script>
     <script type="text/javascript" src="/static/lib/layui/layui.js" charset="utf-8"></script>
     <script type="text/javascript" src="/static/js/xadmin.js"></script>
 
@@ -19,6 +19,7 @@
       <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
       <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
+
   </head>
   
   <body>
@@ -41,12 +42,12 @@
           身份证号：<input id="addw"   type="text" name="studentid" lay-verify="required" placeholder="" autocomplete="off" class="layui-input" style="margin-right: 5em">
           <input value="添加" class="layui-btn" lay-submit lay-filter="add" style="width:20%;" type="submit">
 		</form>
-	<form class="layui-form layui-col-md12 x-so" method="post" action="/company/shanchustudent/">
+	<form class="layui-form layui-col-md12 x-so" id="shanchu_form" method="post" action="/company/shanchustudent/">
         {% csrf_token %}
       <table class="layui-table">
         <thead>
           <tr>
-            <th style="text-align:center"><input type="submit" value="删除" class="layui-btn layui-btn-danger" lay-submit lay-filter="shanchu"></th>
+            <th style="text-align:center"><input style="width: 6em" onclick="shanchu()" value="删除"  class="layui-btn layui-btn-danger" lay-submit lay-filter="shanchu"></th>
             </th>
             <th style="text-align:center";>学号</th>
             <th  style="text-align:center">姓名</th>
@@ -84,7 +85,7 @@
     </form>
     <div class="x-body">
       <div class="layui-row">
-          <form class="layui-form layui-col-md12 x-so" method="post" action="/company/yaoyue_handle/">
+          <form class="layui-form layui-col-md12 x-so" method="post" id="yaoyue_form" action="/company/yaoyue_handle/">
               {% csrf_token %}
         <blockquote class="layui-elem-quote">签约信息填写</blockquote>
               签约有效天数：<input type="text" name="qianyuetianshu" lay-verify="number" placeholder="" autocomplete="off" class="layui-input" style="margin-right: 5em">
@@ -123,7 +124,7 @@
           档案接收：
           
           <div class="layui-input-inline" style="margin-right: 3em" >
-          <select id="selectDangan" name="danganjieshou" lay-filter="level"><option value="0">学生自行解决户档</option><option value="1">用人单位接收档案</option></select>
+          <select id="selectDangan" name="selectDangan" lay-filter="level"><option value='0'>学生自行解决户档</option><option value="1">用人单位接收档案</option></select>
           </div>
          <hr class="hr15"/>
 		<div id="dangan" style="display:none">
@@ -135,13 +136,48 @@
           档案接收收件人：<input class="layui-input" placeholder="开始日" name="jieshouren" style="margin-right: 1em;">
           档案接收联系电话：<input class="layui-input" placeholder="开始日" name="jieshoudianhua" style="margin-right: 3em;">
        </div>
-       <input value="邀约" class="layui-btn" lay-submit lay-filter="yaoyue" style="width:20%;" type="submit">
+       <input value="邀约" class="layui-btn" lay-submit lay-filter="yaoyue" onclick="yaoyue()" style="width:20%;">
         </form>
       </div>
 
     </div>
 	</body>
     <script>
+
+
+       	function yaoyue() {
+
+            layer.confirm('确认要进行邀约吗？', {
+                btn: ['确认', '取消'] //按钮
+            }, function () {
+                $("#yaoyue_form").submit();
+            }, function () {
+
+            });
+        }
+
+       	function shanchu() {
+
+            layer.confirm('确认要删除吗？', {
+                btn: ['确认', '取消'] //按钮
+            }, function () {
+                $("#shanchu_form").submit();
+            }, function () {
+
+            });
+        }
+
+
+
+       	  //   if(confirm("确定删除吗？")){
+            //     $("#shanchu_form").submit();
+            // }
+            // else {
+            //     return false;
+            // }
+
+
+
 	layui.use('form',function(){
 		var form = layui.form;
 
@@ -158,8 +194,9 @@
 				data:{studentid:txt_value, csrfmiddlewaretoken: '{{ csrf_token  }}'},
 				dataType:"json",
 				success:function (data) {
-				    alert(data.msg);
+
                     window.location.reload();
+                    alert(data.msg);
             	}
 			});
 		}, function(){
@@ -172,15 +209,19 @@
 	});
 
 
-		form.on('submit(yaoyue)', function(data){
-			layer.alert('内容');
-
-		});
-
-        form.on('submit(shanchu)', function(data){
 
 
-		});
+
+       	  //   if(confirm("确定删除吗？")){
+            //     $("#shanchu_form").submit();
+            // }
+            // else {
+            //     return false;
+            // }
+
+
+
+
 
 		form.on('select(level)', function(data){
 			if(data.value==1){

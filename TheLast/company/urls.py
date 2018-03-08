@@ -23,5 +23,7 @@ urlpatterns = [
     url(r'^chaxun/(\d*)$', views.company_chaxun),
     url(r'^chaxun/(\d+)/$', views.company_chaxun),
     url(r'^chaxun_xiangxixinxi_(\d+)/$', views.company_chaxun_xiangxixinxi),
-    url(r'^chaxun_sousuo/$', views.company_chaxun_sousuo),
+    url(r'^chaxun_sousuo/(\d*)$', views.company_chaxun_sousuo),
+    url(r'^chaxun_sousuo/(\d+)/$', views.company_chaxun_sousuo),
+    url(r'^quxiaoyaoyue/$', views.company_quxiaoyaoyue),
 ]

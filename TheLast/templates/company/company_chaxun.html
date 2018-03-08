@@ -18,6 +18,19 @@
       <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
       <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
+
+
+      <script type="text/javascript">
+            quxiaochenggong = {{quxiaochenggong}}
+              if(quxiaochenggong ==1){
+                  alert("取消邀约成功！");
+              }else if(quxiaochenggong ==0) {
+                  alert("请重新取消！");
+              }
+    </script>
+
+
+
   </head>
   
   <body>
@@ -33,7 +46,7 @@
     </div>
     <div class="x-body">
       <div class="layui-row">
-        <form class="layui-form layui-col-md12 x-so" action="/company/chaxun_sousuo/" method="post">
+        <form class="layui-form layui-col-md12 x-so" action="/company/chaxun_sousuo/" method="get">
           学生姓名：<input type="text" name="u_name"  placeholder="姓名查询" autocomplete="off" class="layui-input" style="margin-right: 5em">
           学号：<input type="text" name="u_id"  placeholder="学号查询" autocomplete="off" class="layui-input" style="margin-right: 5em">
           学院：<input type="text" name="u_xueyuan"  placeholder="学院查询" autocomplete="off" class="layui-input" style="margin-right: 5em">

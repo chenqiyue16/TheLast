@@ -92,8 +92,9 @@ def company_yaoyue_handle(request):
     zhuanzhengxinshui = request.POST.get('zhuanzhengxinshui')
     qita = request.POST.get('qita')
     zhiweileibie = request.POST.get('zhiweileibie')
-    danganjieshou = request.POST.get('danganjieshou', None)
-
+    danganjieshou = request.POST.get('selectDangan', None)
+    print(danganjieshou)
+    print('???')
     students = LinshiInfo.objects.all()
     for student in students:
         qianyue = QianyueInfo()
@@ -106,7 +107,7 @@ def company_yaoyue_handle(request):
         qianyue.q_qita = qita
         qianyue.q_gangwei = qianyuegangwei
         qianyue.q_zhiweileibie = zhiweileibie
-        qianyue.q_danganjieshou = danganjieshou
+        qianyue.q_danganjieshou = int(danganjieshou)
 
         if danganjieshou != None:
             jieshoubumen = request.POST.get('jieshoubumen')
@@ -281,27 +282,38 @@ def company_addstudent(request):
     print(studentid)
     id =request.session.get('u_id', None)
     if studentid != None and id != None:
+
         stlinshi = LinshiInfo.objects.filter(u_identyid=studentid)
         if stlinshi.exists():
             return HttpResponse(json.dumps({"msg": '此人您已发出邀约！'}))
         else:
-            students = StudentInfo.objects.filter(u_identyid=str(studentid))
-            student = LinshiInfo()
-            student.u_id = students[0].u_id
-            student.u_name = students[0].u_name
-            student.u_xueyuan = students[0].u_xueyuan
-            student.u_nianji = students[0].u_nianji
-            student.u_xueli = students[0].u_xueli
-            student.u_zhuanye = students[0].u_zhuanye
-            student.u_status = students[0].u_status
-            student.u_identyid = students[0].u_identyid
-            student.u_company_id = str(id)
-            student.save()
-            print('u_name')
-            print(student.u_name)
-            print(student)
-            return HttpResponse(json.dumps({"msg": '添加成功'}))
-    return redirect('/company/login/')
+            stlinshi = QianyueInfo.objects.filter(q_student_id__u_identyid=studentid, q_company_id=id)
+            if stlinshi.exists():
+                return HttpResponse(json.dumps({"msg": '此人您已发出邀约！'}))
+            else:
+                students = StudentInfo.objects.filter(u_identyid=studentid)
+
+                print(students)
+                if students:
+                    if students[0].u_status == '未签约':
+                        student = LinshiInfo()
+                        student.u_id = students[0].u_id
+                        student.u_name = students[0].u_name
+                        student.u_xueyuan = students[0].u_xueyuan
+                        student.u_nianji = students[0].u_nianji
+                        student.u_xueli = students[0].u_xueli
+                        student.u_zhuanye = students[0].u_zhuanye
+                        student.u_status = students[0].u_status
+                        student.u_identyid = students[0].u_identyid
+                        student.u_company_id = str(id)
+                        student.save()
+                        return HttpResponse(json.dumps({"msg": '添加成功'}))
+                    else:
+                        return HttpResponse(json.dumps({"msg": '添加失败，此人已完成签约！'}))
+                else:
+                    return HttpResponse(json.dumps({"msg": '添加失败,无效的身份证号'}))
+    else:
+        return redirect('/company/login/')
 
 
 def company_chaxun(request, pIndex):
@@ -336,51 +348,57 @@ def company_chaxun_xiangxixinxi(request, id):
     return render(request, 'company/company_chaxun_xiangxixinxi.html', context)
 
 
-def company_chaxun_sousuo(request):
+def company_chaxun_sousuo(request, pIndex):
+
     queryset = {}
     kwargs = {}
     id = request.session.get('u_id')
-    print(id)
-    queryset['u_name'] = request.POST.get('u_name', None)
-    queryset['u_id'] = request.POST.get('u_id', None)
-    queryset['u_identyid'] = request.POST.get('u_identyid', None)
-    queryset['u_xueyuan'] = request.POST.get('u_xueyuan', None)
-    queryset['u_zhuanye'] = request.POST.get('u_zhuanye', None)
-    queryset['u_xueli'] = request.POST.get('u_xueli', None)
-    queryset['FAN1__q_qianyuezhuangtai'] = request.POST.get('u_qianyuezhuangtai', None)
-    queryset['FAN1__q_danganjieshou'] = request.POST.get('u_danganjieshou', None)
+    #print(id)
+    page = request.GET.get('page', None)
+    queryset['u_name'] = request.GET.get('u_name', None)
+    queryset['u_id'] = request.GET.get('u_id', None)
+    queryset['u_identyid'] = request.GET.get('u_identyid', None)
+    queryset['u_xueyuan'] = request.GET.get('u_xueyuan', None)
+    queryset['u_zhuanye'] = request.GET.get('u_zhuanye', None)
+    queryset['u_xueli'] = request.GET.get('u_xueli', None)
+    queryset['FAN1__q_qianyuezhuangtai'] = request.GET.get('u_qianyuezhuangtai', None)
+    queryset['FAN1__q_danganjieshou'] = request.GET.get('u_danganjieshou', None)
     queryset['FAN1__q_company_id'] = id
     for (k, v) in queryset.items():
         if v != '':
             kwargs[k] = v
-    print(kwargs)
-    try:
-        students = StudentInfo.objects.filter(**kwargs)
-    except StudentInfo.DoesNotExist:
-        print('Does Not Exist')
-    for student in students:
-        print(student)
+    #print(kwargs)
 
-    qianyues = QianyueInfo.objects.filter(q_student_id=student.u_id)
-    tests = zip(students, qianyues)
-    context = {'tests': tests}
-    return render(request, 'company/company_chaxun_sousuo.html', context)
-    # if u_name != None
-    #     if u_id != None:
-    #         if u_identyid != None:
-    #             if u_xueyuan != None:
-    #                 if u_zhuanye != None:
-    #                     if u_xueli != None:
-    #                         if u_qianyuezhuangtai !=None:
-    #                             if u_danganjieshou != None:
-    #                                 pass #全不为None
-    #                             elif u_danganjieshou ==None:
-    #                                 pass #档案接收不为None
-    #                         elif u_qianyuezhuangtai ==None:
-    #                     elif u_xueli ==None:
-    #                 elif u_zhuanye ==None:
-    #             elif u_xueyuan == None:
-    #         elif u_identyid == None:
-    #     elif u_id == None:
-    # elif u_name == None:
+    students = StudentInfo.objects.filter(**kwargs).values('u_name', 'u_id', 'u_identyid', 'u_xueyuan', 'u_zhuanye','u_nianji'
+                                                           , 'u_xueli', 'FAN1__q_qianyuezhuangtai', 'FAN1__q_danganjieshou'
+                                                           , 'FAN1__q_company_id')
+    if students:
+        p1 = Paginator(students, 2)
+        if page:
+            page = int(page)
+        else:
+            page = 1
+        list1 = p1.page(page)
+        plist = p1.page_range
+        context = {'plist': plist, 'tests': list1, 'pindex': pIndex}
+        return render(request, 'company/company_chaxun_sousuo.html', context)
 
+    else:
+        nostudents = 1
+        context = {'nostudents': nostudents}
+        return render(request, 'company/company_chaxun_sousuo.html', context)
+
+
+def company_quxiaoyaoyue(request):
+    id = request.session.get('u_id')
+    if id:
+        student_list = request.REQUEST.getlist('student_list')
+        if student_list:
+            for ls in student_list:
+                student = QianyueInfo.objects.get(q_student_id=ls, q_company_id=id)
+                student.delete()
+            return render(request, 'company/company_chaxun_sousuo.html', {'quxiaochenggong': 1, "nostudenbs": 0})
+        else:
+            return render(request, 'company/company_chaxun_sousuo.html', {'quxiaochenggong': 0, "nostudents": 0})
+    else:
+        return redirect('/company/login/')
