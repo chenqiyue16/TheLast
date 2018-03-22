@@ -65,27 +65,21 @@
               <th style="text-align:center">操作</th>
         </thead>
         <tbody>
-        {% for student in students%}
+        {% for student in list1%}
           <tr>
-              <td align="center">{{student.q_student_id}}</td>
-                <td align="center" >{{student.q_student_id__u_name}}</td>
-                <td align="center">{{student.q_student_id__u_identyid}}</td>
-                <td align="center">{{student.q_student_id__u_xueyuan}}</td>
-                <td align="center">{{student.q_student_id__u_zhuanye}}</td>
-                <td align="center">{{student.q_student_id__u_nianji}}</td>
-                <td align="center">{{student.q_student_id__u_xueli}}</td>
+              <td align="center">{{student.u_id}}</td>
+                <td align="center" >{{student.u_name}}</td>
+                <td align="center">{{student.u_identyid}}</td>
+                <td align="center">{{student.u_xueyuan}}</td>
+                <td align="center">{{student.u_zhuanye}}</td>
+                <td align="center">{{student.u_nianji}}</td>
+                <td align="center">{{student.u_xueli}}</td>
                 <td align="center" class="td-status">
-                    {% if student.q_qianyuezhuangtai == 0%}
-                 <span class="layui-btn layui-btn-normal layui-btn-mini">已邀约</span></td>
-                    {% endif %}
-                    {% if student.q_qianyuezhuangtai == 1%}
-                 <span class="layui-btn layui-btn layui-btn-mini">已签约</span></td>
-                    {% endif %}
-                    {% if student.q_qianyuezhuangtai == -1%}
-                 <span class="layui-btn layui-btn-danger layui-btn-mini">已拒绝</span></td>
-                    {% endif %}
+
+                 <span class="layui-btn layui-btn layui-btn-mini">{{student.u_status}}</span></td>
+
               <td class="td-manage" align="center">
-              <a title="查看详细信息" onclick="x_admin_show('个人信息','/company/chaxun_xiangxixinxi_{{student.q_student_id}}/')">
+              <a title="查看三方协议" onclick="x_admin_show('查看三方协议','/company/getsanfangxieyi_{{student.u_id}}/')">
                 <i class="layui-icon">&#xe601;</i>
               </a>
             </td>
@@ -97,21 +91,21 @@
       <div class="page">
         <div>
 
-            {% if students.has_previous%}
-            <a class="prev" href="/company/chaxun/{{students.previous_page_number}}/">&lt;&lt;</a>
+            {% if list1.has_previous%}
+            <a class="prev" href="/company/qianyueinfo/{{list1.previous_page_number}}/">&lt;&lt;</a>
             {%endif%}
             {%for pindex in plist%}
 
-            {%if pIndex == pindex%}
+            {%if pindex == pIndex%}
             <span class="current">{{pindex}}</span>
             {%else%}
-            <a class="num" href="/company/chaxun/{{pindex}}/">{{pindex}}</a>
+            <a class="num" href="/company//{{pindex}}/">{{pindex}}</a>
             {% endif %}
             {%endfor%}
 
 
-            {% if students.has_next%}
-            <a class="next" href="/company/chaxun/{{students.next_page_number}}/">&gt;&gt;</a>
+            {% if list1.has_next%}
+            <a class="next" href="/company/qianyueinfo/{{list1.next_page_number}}/">&gt;&gt;</a>
             {%endif%}
 
         </div>

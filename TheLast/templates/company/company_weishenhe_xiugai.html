@@ -39,9 +39,9 @@
     
     <div class="x-body">
       <div class="layui-row">
-      <form class="layui-form layui-col-md12 x-so">
+      <form class="layui-form layui-col-md12 x-so" method="post" action="/company/xiugaihandle/">
        <blockquote class="layui-elem-quote">企业信息修改</blockquote>
-        
+            {%csrf_token%}
           用人单位名称：<input type="text" name="danweimingcheng" lay-verify="required" value="{{company.c_danweimingcheng}}" autocomplete="off" class="layui-input" style="margin-right: 5em">
           单位隶属：<input type="text" name="danweilishu" lay-verify="required" value="{{company.c_danweilishu}}" autocomplete="off" class="layui-input" style="margin-right: 5em">
           联系人：<input type="text" name="lianxiren" lay-verify="required" value="{{company.c_lianxiren}}" autocomplete="off" class="layui-input" style="margin-right: 5em">
@@ -55,13 +55,13 @@
 
           单位性质：
           <div style="margin-right: 2em" class="layui-input-inline">
-          	<select style="width:5em" ><option value="1">已签约</option><option value="2">已签约</option><option value="3">已签约</option></select>
+          	<select name="danweixingzhi" style="width:5em" ><option value="1">已签约</option><option value="2">已签约</option><option value="3">已签约</option></select>
 		  </div>
           <hr class="hr15"/>
 
           单位行业：
           <div  class="layui-input-inline" style="margin-right: 6em">
-          	<select style="width:5em"><option value="1">已签约</option></select>
+          	<select name="danweihangye" style="width:5em"><option value="1">已签约</option></select>
           </div>
 
            <hr class="hr15"/>

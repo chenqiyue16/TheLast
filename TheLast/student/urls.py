@@ -9,5 +9,8 @@ urlpatterns = [
     url(r'^chakanxiangxixinxi_(\d*)$', views.student_chakanxiangxixinxi),
     url(r'^chakanxiangxixinxi_(\d+)/$', views.student_chakanxiangxixinxi),
     url(r'^jieshouyaoyue/$', views.student_jieshouyaoyue),
-    url(r'^qianyuexinxi/$', views.student_qianyuexinxi)
+    url(r'^qianyuexinxi/$', views.student_qianyuexinxi),
+    url(r'^wuliuxinxiluru/$', views.student_wuliuxinxiluru),
+    url(r'^wuliuxinxichakan/$', views.student_wuliuxinxichakan),
+    url(r'^wuliuxinxibaocun/$', views.student_wuliuxinxibaocun),
     ]

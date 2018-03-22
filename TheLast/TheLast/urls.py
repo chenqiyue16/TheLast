@@ -20,4 +20,5 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^company/', include('company.urls')),
     url(r'student/', include('student.urls')),
+    url(r'teacher/', include('teacher.urls')),
 ]

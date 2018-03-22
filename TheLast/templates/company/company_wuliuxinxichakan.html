@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.0</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="/static/css/font.css">
+    <link rel="stylesheet" href="/static/css/xadmin.css">
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+      <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+
+      <script type="text/javascript">
+
+          $(function () {
+              nostudents = {{nostudents}}
+
+              if(nostudents == 1){
+                  alert('查询结果不存在！');
+              }
+
+
+          });
+    </script>
+
+
+
+  </head>
+
+  <body>
+    <div class="x-nav">
+      <span class="layui-breadcrumb">
+        <a href="">首页</a>
+        <a href="">演示</a>
+        <a>
+          <cite>导航元素</cite></a>
+      </span>
+      <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
+        <i class="layui-icon" style="line-height:30px">ဂ</i></a>
+    </div>
+    <div class="x-body">
+      <div class="layui-row">
+        <form class="layui-form layui-col-md12 x-so" action="/company/wuliuxinxichakan_sousuo/" method="get">
+          学生姓名：<input type="text" name="u_name"  placeholder="姓名查询" autocomplete="off" class="layui-input" style="margin-right: 5em">
+          学号：<input type="text" name="u_id"  placeholder="学号查询" autocomplete="off" class="layui-input" style="margin-right: 5em">
+          学院：<input type="text" name="u_xueyuan"  placeholder="学院查询" autocomplete="off" class="layui-input" style="margin-right: 5em">
+          <hr class="hr15">
+            {% csrf_token %}
+          身份证号：<input type="text" name="u_identyid"  placeholder="身份证号查询" autocomplete="off" class="layui-input" style="margin-right: 5em">
+            岗位：<input type="text" name="u_gangwei"  placeholder="岗位查询" autocomplete="off" class="layui-input" style="margin-right: 5em">
+            年级：
+            <div style="margin-right: 5em" class="layui-input-inline">
+              <select name="u_nianji">
+                    <option></option>
+                    <option value="2013级">2013级</option>
+                    <option value="2014级">2014级</option>
+                    <option value="2015级">2015级</option>
+                    <option value="2016级">2016级</option>
+                    <option value="2017级">2017级</option>
+                    <option value="2018级">2018级</option>
+
+              </select>
+          </div>
+
+          <hr class="hr15">
+
+
+          <button class="layui-btn layui-btn-primary" lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i>查询</button>
+        </form>
+      </div>
+      <xblock>
+
+        当前邀约学生管理
+      </xblock>
+      <table class="layui-table">
+        <thead>
+          <tr>
+
+            <th style="text-align:center";>学号</th>
+            <th  style="text-align:center">姓名</th>
+             <th  style="text-align:center">身份证号</th>
+            <th style="text-align:center">学院</th>
+            <th  style="text-align:center">年级</th>
+            <th style="text-align:center">岗位</th>
+            <th style="text-align:center">公司邮寄</th>
+            <th style="text-align:center">学生返寄</th>
+              <th style="text-align:center">操作</th>
+        </thead>
+        <tbody>
+        {% for student in tests %}
+          <tr>
+              <td align="center">{{student.u_id}}</td>
+                <td align="center" >{{student.u_name}}</td>
+                <td align="center">{{student.u_identyid}}</td>
+                <td align="center">{{student.u_xueyuan}}</td>
+                <td align="center">{{student.u_nianji}}</td>
+                <td align="center">{{student.FAN1__q_gangwei}}</td>
+                <td align="center">{{student.FAN1__q_com_kuaidi}}</td>
+              <td align="center">{{student.FAN1__q_stu_kuaidi}}</td>
+              <td class="td-manage" align="center">
+              <a title="查看详细物流信息" onclick="x_admin_show('物流信息','/company/wuliuxinxichakan_xiangxixinxi_{{student.u_id}}/')">
+                <i class="layui-icon">&#xe601;</i>
+              </a>
+            </td>
+
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      <div class="page">
+        <div>
+            {% if tests.has_previous%}
+            <a  id="pre" class="prev" href="/company/wuliuxinxichakan/{{tests.previous_page_number}}">&lt;&lt;</a>
+            {%endif%}
+            {%for pindex in plist%}
+
+            {%if pindex == pIndex%}
+            <span class="current">{{pindex}}</span>
+            {%else%}
+            <a id="ind" class="num" href="/company/wuliuxinxichakan/{{pindex}}">{{pindex}}</a>
+            {% endif %}
+            {%endfor%}
+
+
+            {% if tests.has_next%}
+            <a id="nex" class="next" href="/company/wuliuxinxichakan/{{tests.next_page_number}}">&gt;&gt;</a>
+            {%endif%}
+        </div>
+      </div>
+
+    </div>
+     </body>
+    <script>
+
+    </script>
+    <script>var _hmt = _hmt || []; (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?b393d153aeb26b46e9431fabaf0f6190";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+      })();</script>
+
+
+</html>

@@ -38,6 +38,11 @@ class QianyueInfo(models.Model):
     q_jieshouren = models.CharField(null=True, blank=True, max_length=8)
     q_jieshoudianhua = models.CharField(null=True, blank=True, max_length=13)
     q_qianyuezhuangtai = models.IntegerField(default=0)
+    q_com_kuaidi = models.CharField(max_length=18, null=True)
+    q_stu_kuaidi = models.CharField(max_length=18, null=True)
     q_student = models.ForeignKey('student.StudentInfo', related_name="FAN1")
     q_company = models.ForeignKey(CompanyInfo, related_name="FAN2")
+
+
+
 

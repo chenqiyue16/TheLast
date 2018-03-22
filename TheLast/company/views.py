@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect
 from .models import *
-from student.models import LinshiInfo, StudentInfo
+from student.models import LinshiInfo, StudentInfo, QianyueStudent
 from django.core.paginator import Paginator
 from hashlib import sha1
 from django.http import HttpResponse, HttpResponseRedirect
@@ -8,12 +8,28 @@ import json
 import pdfkit
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
+import requests
+import importlib
+import urllib
+import urllib.request
+import base64
+import hashlib
+import urllib.parse
+from django.db.models.aggregates import Count
 # Create your views here.
+
+APP_id = "1266271"
+APP_key = "7526a46e-3a2a-4f5b-8659-d72f361e3386"
 
 
 def company_login(request):
 
     return render(request, 'company/company_login.html')
+
+
+def company_tuichu(request):
+    request.session.clear()
+    return redirect('/company/login/')
 
 
 def login_handle(request):
@@ -53,16 +69,17 @@ def login_handle(request):
 
 
 def company_index(request):
-    if request.session.get('shenhe') == 1:
-        name = request.session.get('username')
-        danweimingcheng = request.session.get('danweimingcheng')
-        id = request.session.get('u_id')
-        context = {'name': name, 'danweimingcheng': danweimingcheng, 'id': id}
-        return render(request, 'company/index.html', context)
+    if request.session.get('u_id'):
+        if request.session.get('shenhe') == 1:
+            name = request.session.get('username')
+            danweimingcheng = request.session.get('danweimingcheng')
+            id = request.session.get('u_id')
+            context = {'name': name, 'danweimingcheng': danweimingcheng, 'id': id}
+            return render(request, 'company/index.html', context)
+        else:
+            return redirect('/company/weishenhe')
     else:
-        return redirect('/company/weishenhe')
-
-
+        return redirect('/company/login/')
 
 
 def company_welcome(request):
@@ -129,10 +146,45 @@ def company_yaoyue_handle(request):
     return redirect('/company/chakan/')
 
 
+class Express100(object):
+
+    company_url = "http://www.kuaidi100.com/autonumber/autoComNum"
+    trace_url = "http://www.kuaidi100.com/query"
+
+    @classmethod
+    def get_json_data(cls, url, payload):
+        r = requests.get(url=url, params=payload)
+        return r.json()
+
+    @classmethod
+    def get_company_info(cls, express_code):
+        payload = {'text': express_code}
+        data = cls.get_json_data(cls.company_url, payload)
+        return data
+
+    @classmethod
+    def get_express_info(cls, express_code):
+        company_info = cls.get_company_info(express_code)
+        company_code = ""
+        if company_info.get("auto", ""):
+            company_code = company_info.get("auto", "")[0].get("comCode", "")
+        payload = {'type': company_code, 'postid': express_code, 'id': 1}
+        data = cls.get_json_data(cls.trace_url, payload)
+        data.update(company_info)
+        return data
 
 
 def test(request):
-    return render(request, 'company/test.html')
+    # 此处为快递鸟官网申请的帐号和密码
+    code = '813164737871'
+    res = Express100.get_express_info(str(code).strip())
+    messagelist = []
+    #res1 = json.dumps(res, ensure_ascii=False, sort_keys=True, indent=4)
+    for test in res["data"]:
+        messagelist.append(test['ftime'] + '  :  ' + test['context'])
+    print(messagelist)
+    context = {'messagelist': messagelist}
+    return render(request, 'company/test.html', context)
 
 
 def testpdf(request):
@@ -213,38 +265,42 @@ def company_registerhandle(request):
     username = request.session.get('username')
     print(username)
     if username != "":
-        password = request.session.get('password')
-        danweimingcheng = request.session.get('danweimingcheng')
-        zuzhijigoudaima = request.session.get('zuzhijigoudaima')
-        danweilishu = request.POST.get('danweilishu')
-        danweihangye = request.POST.get('danweihangye')
-        danweixingzhi = request.POST.get('danweixingzhi')
-        lianxiren = request.POST.get('lianxiren')
-        lianxidianhua = request.POST.get('lianxidianhua')
-        tongxindizhi = request.POST.get('tongxindizhi')
-        zhizhao = request.FILES.get('zhizhao')
-        email = request.POST.get('email')
-        print(zhizhao)
-        fname = '%s/zhizhao/%s' % (settings.MEDIA_ROOT, zhizhao.name)
-        with open(fname, 'wb') as pic:
-            for c in zhizhao.chunks():
-                pic.write(c)
-        company = CompanyInfo()
-        company.c_username = username
-        company.c_password = password
-        company.c_danweimingcheng = danweimingcheng
-        company.c_zuzhijigoudaima = zuzhijigoudaima
-        company.c_danweilishu = danweilishu
-        company.c_lianxiren = lianxiren
-        company.c_lianxidianhua = lianxidianhua
-        company.c_danweihangye = danweihangye
-        company.c_danweixingzhi = danweixingzhi
-        company.c_tongxindizhi = tongxindizhi
-        company.c_pic = fname
-        company.c_youxiang = email
+        company = CompanyInfo.objects.filter(c_username=username)
+        if company:
+            return HttpResponse('<script type="text/javascript" > alert("用户名已存在！请不要重复注册！")</script>')
+        else:
+            password = request.session.get('password')
+            danweimingcheng = request.session.get('danweimingcheng')
+            zuzhijigoudaima = request.session.get('zuzhijigoudaima')
+            danweilishu = request.POST.get('danweilishu')
+            danweihangye = request.POST.get('danweihangye')
+            danweixingzhi = request.POST.get('danweixingzhi')
+            lianxiren = request.POST.get('lianxiren')
+            lianxidianhua = request.POST.get('lianxidianhua')
+            tongxindizhi = request.POST.get('tongxindizhi')
+            zhizhao = request.FILES.get('zhizhao')
+            email = request.POST.get('email')
+            print(zhizhao)
+            fname = '%s/zhizhao/%s.jpg' % (settings.MEDIA_ROOT, zuzhijigoudaima)
+            with open(fname, 'wb') as pic:
+                for c in zhizhao.chunks():
+                    pic.write(c)
+            company = CompanyInfo()
+            company.c_username = username
+            company.c_password = password
+            company.c_danweimingcheng = danweimingcheng
+            company.c_zuzhijigoudaima = zuzhijigoudaima
+            company.c_danweilishu = danweilishu
+            company.c_lianxiren = lianxiren
+            company.c_lianxidianhua = lianxidianhua
+            company.c_danweihangye = danweihangye
+            company.c_danweixingzhi = danweixingzhi
+            company.c_tongxindizhi = tongxindizhi
+            company.c_pic = fname
+            company.c_youxiang = email
 
-        company.save()
-        return HttpResponse('helloword!')
+            company.save()
+            return redirect('/company/login/')
     else:
         return redirect('/company/register1/')
 
@@ -267,6 +323,28 @@ def company_weishenhe_xiugai(request):
     context = {'company': company}
     return render(request, 'company/company_weishenhe_xiugai.html', context)
 
+
+def company_xiugaihandle(request):
+    id = request.session.get('u_id')
+    if id:
+        danweimingcheng = request.POST.get('danweimingcheng')
+        danweilishu = request.POST.get('danweilishu')
+        lianxiren = request.POST.get('lianxiren')
+        lianxidianhua = request.POST.get('lianxidianhua')
+        youxiang = request.POST.get('email')
+        tongxindizhi =request.POST.get('tongxindizhi')
+        danweixingzhi = request.POST.get('danweixingzhi')
+        danweihangye = request.POST.get('danweihangye')
+
+        CompanyInfo.objects.filter(id=id).update(c_danweimingcheng=danweimingcheng, c_danweilishu=danweilishu,
+                                                 c_lianxiren=lianxiren, c_lianxidianhua=lianxidianhua,
+                                                 c_youxiang=youxiang, c_tongxindizhi=tongxindizhi,
+                                                 c_danweixingzhi=danweixingzhi, c_danweihangye=danweihangye,
+                                                 c_shenhe=0)
+        request.session['shenhe'] = 0
+        return HttpResponse('修改成功！请耐心等待审核')
+    else:
+        return redirect('/company/login/')
 
 def company_info(request):
     id = request.session.get('u_id')
@@ -332,7 +410,7 @@ def company_chaxun(request, pIndex):
         pIndex = int(pIndex)
         list2 = p.page(pIndex)
         plist = p.page_range
-        context = {'plist': plist, 'students': list2, 'pindex': pIndex}
+        context = {'plist': plist, 'students': list2, 'pIndex': pIndex}
 
         return render(request, 'company/company_chaxun.html', context)
     else:
@@ -380,7 +458,7 @@ def company_chaxun_sousuo(request, pIndex):
             page = 1
         list1 = p1.page(page)
         plist = p1.page_range
-        context = {'plist': plist, 'tests': list1, 'pindex': pIndex}
+        context = {'plist': plist, 'tests': list1, 'pIndex': page}
         return render(request, 'company/company_chaxun_sousuo.html', context)
 
     else:
@@ -402,3 +480,214 @@ def company_quxiaoyaoyue(request):
             return render(request, 'company/company_chaxun_sousuo.html', {'quxiaochenggong': 0, "nostudents": 0})
     else:
         return redirect('/company/login/')
+
+
+def company_qianyueinfo(request, page):
+    company_id = request.session.get('u_id')
+    if company_id:
+        qianyuestudent = QianyueStudent.objects.filter(u_company_id=company_id)
+        if page:
+            page = int(page)
+        else:
+            page = 1
+        p1 = Paginator(qianyuestudent, 2)
+        list1 = p1.page(page)
+        plist = p1.page_range
+
+        context = {'list1': list1, 'plist': plist, 'pIndex': page}
+        return render(request, 'company/company_qianyueinfo.html', context)
+
+
+def company_sanfangxieyi(request, student_id):
+
+    company_id = request.GET.get('test')
+    t = str(company_id)
+    print('t:'+t)
+    print('student_id:'+ student_id)
+    if t:
+        qianyuestudent = QianyueStudent.objects.filter(u_id=student_id)[0]
+        qianyue = QianyueInfo.objects.filter(q_company_id=t, q_student_id=student_id)[0]
+        company = CompanyInfo.objects.filter(id=t)[0]
+        context = {'student': qianyuestudent, 'qianyue': qianyue, 'company': company}
+
+        return render(request, 'company/company_sanfangxieyi.html', context)
+    else:
+        return redirect('/company/login/')
+
+
+
+def company_getsanfangxieyi(request, student_id):
+    print("test")
+    company_id = request.session.get('u_id')
+    if company_id:
+        url1 = 'http://127.0.0.1:8000/company/sanfangxieyi_' + str(student_id)+'/?test='+str(company_id)
+    #url1 = 'http://127.0.0.1:8000/company/sanfangxieyi_235373/'
+        url2 = 'static/sanfangxieyi/sanfangxieyi_'+str(student_id)+'.pdf'
+        print(url1)
+        print(url2)
+        pdfkit.from_url(url1, url2)
+        url3 = '/static/sanfangxieyi/sanfangxieyi_' + str(student_id)+'.pdf'
+        return redirect(url3)
+    else:
+        redirect('/company/login/')
+
+
+def company_wuliuxinxiluru(request):
+    return render(request, 'company/company_wuliuxinxiluru.html')
+
+
+def company_wuliuxinxi_check(request):
+    identyid = request.POST.get('identyid')
+    company_id = request.session.get('u_id')
+    qianyuestudents = QianyueStudent.objects.filter(u_identyid=identyid, u_company_id=company_id)
+    if qianyuestudents:
+        rtxt = qianyuestudents[0].u_name
+        return HttpResponse(json.dumps({"msg": "成功", "u_name": rtxt}))
+    else:
+        rtxt = '未查找到该学生'
+        return HttpResponse(json.dumps({"msg": rtxt}))
+
+
+def company_wuliuxinxi_baocun(request):
+    u_id = request.session.get('u_id')
+    if u_id:
+        print(u_id)
+        identyid = request.POST.get('identyid')
+        kuaidi = request.POST.get('kuaidi1')
+        QianyueInfo.objects.filter(q_student_id__u_identyid=identyid, q_company_id=u_id).update(q_com_kuaidi=kuaidi)
+        return redirect('/company/wuliuxinxichakan/')
+    else:
+        return redirect('/company/login/')
+
+
+def company_wuliuxinxi_chakan(request, page):
+    print('why')
+    u_id = request.session.get('u_id')
+    students = StudentInfo.objects.filter(FAN1__q_company_id=u_id, FAN1__q_qianyuezhuangtai=1).values('u_name', 'u_id', 'u_identyid', 'u_xueyuan', 'u_nianji', 'FAN1__q_gangwei', 'FAN1__q_com_kuaidi', 'FAN1__q_stu_kuaidi', 'FAN1__q_company_id')
+    p1 = Paginator(students, 1)
+    if page:
+        page = int(page)
+    else:
+        page = 1
+    list1 = p1.page(page)
+    plist = p1.page_range
+    context = {'plist': plist, 'tests': list1, 'pIndex': page}
+    return render(request, 'company/company_wuliuxinxichakan.html', context)
+
+
+def company_wuliuxinxi_chakan_sousuo(request):
+    queryset = {}
+    kwargs = {}
+    id = request.session.get('u_id')
+    #print(id)
+    page = request.GET.get('page', None)
+    queryset['u_name'] = request.GET.get('u_name', None)
+    queryset['u_id'] = request.GET.get('u_id', None)
+    queryset['u_identyid'] = request.GET.get('u_identyid', None)
+    queryset['u_xueyuan'] = request.GET.get('u_xueyuan', None)
+    queryset['u_nianji'] = request.GET.get('u_nianji', None)
+    queryset['FAN1__q_gangwei'] = request.GET.get('u_gangwei', None)
+    queryset['FAN1__q_company_id'] = id
+    queryset['FAN1__q_qianyuezhuangtai'] = 1
+    for (k, v) in queryset.items():
+        if v != '':
+            kwargs[k] = v
+    print(kwargs)
+
+    students = StudentInfo.objects.filter(**kwargs).values('u_name', 'u_id', 'u_identyid', 'u_xueyuan', 'u_nianji'
+                                                           , 'FAN1__q_gangwei', 'FAN1__q_com_kuaidi'
+                                                           , 'FAN1__q_stu_kuaidi'
+                                                           , 'FAN1__q_company_id')
+    if students:
+        p1 = Paginator(students, 1)
+        if page:
+            page = int(page)
+        else:
+            page = 1
+        list1 = p1.page(page)
+        plist = p1.page_range
+        context = {'plist': plist, 'tests': list1, 'pIndex': page}
+        return render(request, 'company/company_wuliuxinxichakan_sousuo.html', context)
+
+    else:
+        nostudents = 1
+        context = {'nostudents': nostudents}
+        return render(request, 'company/company_wuliuxinxichakan_sousuo.html', context)
+
+
+def company_wuliuxinxi_chakan_xiangxixinxi(request, id):
+    # 此处为快递鸟官网申请的帐号和密码
+
+    qianyue = QianyueInfo.objects.filter(q_student_id=id)[0]
+    code1 = qianyue.q_com_kuaidi
+    code2 = qianyue.q_stu_kuaidi
+    res1 = Express100.get_express_info(str(code1).strip())
+    res2 = Express100.get_express_info(str(code2).strip())
+    messagelist1 = []
+    messagelist2 = []
+    #res1 = json.dumps(res, ensure_ascii=False, sort_keys=True, indent=4)
+    for test1 in res1["data"]:
+        messagelist1.append(test1['ftime'] + '  :  ' + test1['context'])
+    for test2 in res2["data"]:
+        messagelist2.append(test2['ftime'] + '  :  ' + test2['context'])
+    if messagelist1 and messagelist2:
+        context = {'messagelist1': messagelist1, 'messagelist2': messagelist2}
+        return render(request, 'company/company_wuliuxinxichakan_xiangxixinxi.html', context)
+    elif messagelist1 and not messagelist2:
+        context = {'messagelist1': messagelist1, 'nowuliuxinxi2': '暂无物流信息呢！'}
+        return render(request, 'company/company_wuliuxinxichakan_xiangxixinxi.html', context)
+    elif messagelist2 and not messagelist1:
+        context = {'messagelist2': messagelist2, 'nowuliuxinxi1': '暂无物流信息呢！'}
+        return render(request, 'company/company_wuliuxinxichakan_xiangxixinxi.html', context)
+    else:
+        context = {'nowuliuxinxi1': '暂无物流信息呢！', 'nowuliuxinxi2': '暂无物流信息呢！'}
+        return render(request, 'company/company_wuliuxinxichakan_xiangxixinxi.html', context)
+
+
+def company_chartstest(request):
+    u_id = request.session.get('u_id')
+    set = QianyueStudent.objects.values_list('u_nianji').annotate(Count('u_nianji')).filter(u_xueli='大学本科', u_company_id=u_id).order_by('u_nianji')
+    set1 = QianyueStudent.objects.values_list('u_nianji').annotate(Count('u_nianji')).filter(u_xueli='硕士研究生', u_company_id=u_id).order_by('u_nianji')
+    set2 = QianyueStudent.objects.distinct().values('u_nianji').order_by('u_nianji')
+
+    benkelist = []
+    benkenianjilist={}
+    shuoshilist = []
+    shuoshinianjilist={}
+    nianjilist = []
+    for s2 in set2:
+        nianjilist.append(s2['u_nianji'])
+
+    for s1 in set1:
+        shuoshinianjilist[s1[0]] = s1[1]
+    for s in set:
+        benkenianjilist[s[0]] = s[1]
+    for nianji in nianjilist:
+        if nianji in shuoshinianjilist:
+            shuoshilist.append(shuoshinianjilist[nianji])
+        else:
+            shuoshilist.append(0)
+    for nianji in nianjilist:
+        if nianji in nianjilist:
+            benkelist.append(benkenianjilist[nianji])
+        else:
+            benkelist.append(0)
+
+    zhuanyeset1 = QianyueStudent.objects.values_list('u_zhuanye').annotate(Count('u_zhuanye')).filter(u_xueli='大学本科', u_company_id=u_id)
+    zhuanyeset2 = QianyueStudent.objects.values_list('u_zhuanye').annotate(Count('u_zhuanye')).filter(u_xueli='硕士研究生', u_company_id=u_id)
+    print(zhuanyeset1)
+    zhuanyeset1_dict = {}
+    zhuanyeset2_dict = {}
+    sum = 0
+    for set1 in zhuanyeset1:
+        sum += set1[1]
+    for set1 in zhuanyeset1:
+        zhuanyeset1_dict[set1[0]] = (set1[1]*100)/sum
+    sum = 0
+    for set2 in zhuanyeset2:
+        sum += set2[1]
+    for set2 in zhuanyeset2:
+        zhuanyeset2_dict[set2[0]] = (set2[1]*100)/sum
+    print(zhuanyeset1_dict)
+    context = {'nianjilist': nianjilist, 'benkelist': benkelist, 'shuoshilist': shuoshilist,'zhuanyeset1_dict': zhuanyeset1_dict, 'zhuanyeset2_dict': zhuanyeset2_dict}
+    return render(request, 'company/company_chartstest.html', context)

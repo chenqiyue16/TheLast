@@ -36,4 +36,7 @@ class QianyueStudent(models.Model):
     u_nianji = models.CharField(max_length=10)
     u_xueli = models.CharField(max_length=10)
     u_status = models.CharField(max_length=5)
+    u_date = models.DateField(null=True, auto_now=True)
     u_company = models.ForeignKey('company.CompanyInfo')
+
+

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.0</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="/static/css/font.css">
+    <link rel="stylesheet" href="/static/css/xadmin.css">
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+      <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <script src="https://cdn.hcharts.cn/highcharts/highcharts.js"></script>
+    <script type="text/javascript">
+        $(function () {
+    $('#container').highcharts({
+        chart: {
+            type: 'bar'
+        },
+        title: {
+            text: '本科生硕士研究生不同年级签约数'
+        },
+        subtitle: {
+            text: ''
+        },
+        xAxis: {
+            allowDecimals:false,
+            categories: [{% for nianji in nianjilist%}
+                            "{{nianji}}",
+                        {%endfor%}],
+            title: {
+                text: null
+            }
+        },
+        yAxis: {
+            allowDecimals:false,
+            min: 0,
+            title: {
+                text: '人数 (人)',
+                align: 'high'
+            },
+            labels: {
+                overflow: 'justify'
+            }
+        },
+        tooltip: {
+            valueSuffix: ' 人'
+        },
+        plotOptions: {
+            bar: {
+                dataLabels: {
+                    enabled: true,
+                    allowOverlap: true
+                }
+            }
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'top',
+            x: -40,
+            y: 100,
+            floating: true,
+            borderWidth: 1,
+            backgroundColor: ((Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'),
+            shadow: true
+        },
+        credits: {
+            enabled: false
+        },
+        series: [{
+            name: '硕士',
+            data: [{%for s in shuoshilist%}
+                    {{s}},
+                  {%endfor%}]
+        }, {
+            name: '本科',
+            data: [{%for b in benkelist%}
+                    {{b}},
+                  {%endfor%}]
+        }]
+    });
+
+
+    $('#container1').highcharts({
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false
+        },
+        title: {
+            text: '本科生专业已签约占比'
+        },
+        tooltip: {
+            headerFormat: '{series.name}<br>',
+            pointFormat: '{point.name}: <b>{point.percentage:.1f}%</b>'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: true,
+                    format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                    style: {
+                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                    }
+                }
+            }
+        },
+        series: [{
+            type: 'pie',
+            name: '本科生专业已签约占比',
+            data: [
+                {%for key,value in zhuanyeset1_dict.items%}
+                ['{{key}}', {{value}}],
+                {%endfor%}
+
+            ]
+        }]
+    });
+
+
+
+    $('#container2').highcharts({
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false
+        },
+        title: {
+            text: '硕士研究生专业已签约占比'
+        },
+        tooltip: {
+            headerFormat: '{series.name}<br>',
+            pointFormat: '{point.name}: <b>{point.percentage:.1f}%</b>'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: true,
+                    format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                    style: {
+                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                    }
+                }
+            }
+        },
+        series: [{
+            type: 'pie',
+            name: '硕士研究生专业已签约占比',
+            data: [
+                {%for key,value in zhuanyeset2_dict.items%}
+                ['{{key}}', {{value}}],
+                {%endfor%}
+
+            ]
+        }]
+    });
+});
+
+    </script>
+</head>
+<body>
+<div id="container" style="width: 1000px;min-width:400px;height:600px"></div>
+<div>
+    <hr class="hr18">
+<div id="container1" style="width: 550px;min-width:300px;height:400px;float: left"></div>
+<div id="container2" style="width: 550px;min-width:300px;height:400px;float: right"></div></div>
+
+</body>
+</html>
