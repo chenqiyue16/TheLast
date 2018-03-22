@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.0</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="/static/css/font.css">
+    <link rel="stylesheet" href="/static/css/xadmin.css">
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+      <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <script src="https://cdn.hcharts.cn/highcharts/highcharts.js"></script>
+    <script type="text/javascript">
+        
+        $(function () {
+       $('#container1').highcharts({
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false
+        },
+        title: {
+            text: '本科生专业已签约占比'
+        },
+        tooltip: {
+            headerFormat: '{series.name}<br>',
+            pointFormat: '{point.name}: <b>{point.percentage:.1f}%</b>'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: true,
+                    format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                    style: {
+                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                    }
+                }
+            }
+        },
+        series: [{
+            type: 'pie',
+            name: '本科生专业已签约占比',
+            data: [
+                {%for key,value in zhuanyeset1_dict.items%}
+                ['{{key}}', {{value}}],
+                {%endfor%}
+
+            ]
+        }]
+    });
+
+
+
+    $('#container2').highcharts({
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false
+        },
+        title: {
+            text: '硕士研究生专业已签约占比'
+        },
+        tooltip: {
+            headerFormat: '{series.name}<br>',
+            pointFormat: '{point.name}: <b>{point.percentage:.1f}%</b>'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: true,
+                    format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                    style: {
+                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                    }
+                }
+            }
+        },
+        series: [{
+            type: 'pie',
+            name: '硕士研究生专业已签约占比',
+            data: [
+                {%for key,value in zhuanyeset2_dict.items%}
+                ['{{key}}', {{value}}],
+                {%endfor%}
+
+            ]
+        }]
+    });
+
+
+    $('#container').highcharts({
+                 chart: {
+        type: 'spline'
+    },
+    title: {
+        text: '不同学历完成签约趋势'
+    },
+    subtitle: {
+        text: '规律性时间内的变化'
+    },
+    xAxis: {
+        type: 'datetime',
+        title: {
+            text: null
+        }
+    },
+    yAxis: {
+        allowDecimals:false ,
+        title: {
+            text: '签约人数 (人)'
+
+        },
+        min: 0
+    },
+    tooltip: {
+        headerFormat: '<b>{series.name}</b><br>',
+        pointFormat: '{point.x:%e. %b}: {point.y} 人'
+    },
+    plotOptions: {
+        spline: {
+            marker: {
+                enabled: true
+            }
+        }
+    },
+    series: [{
+        name: '本科生',
+        // Define the data points. All series have a dummy year
+        // of 1970/71 in order to be compared on the same x axis. Note
+        // that in JavaScript, months start at 0 for January, 1 for February etc.
+        data: [
+    {% for list in datelist1 %}
+    [Date.UTC({{list.year}}, {{list.month}}, {{list.day}}), {{list.count}}],
+    {% endfor %}
+        ]
+    }, {
+        name: '研究生',
+        data: [
+    {% for list in datelist2 %}
+    [Date.UTC({{list.year}}, {{list.month}}, {{list.day}}), {{list.count}}],
+    {% endfor %}
+        ]
+    }]
+            })
+        })
+</script>
+</head>
+
+<body>
+
+<div id="container" style="min-width:400px;height:400px"></div>
+    <hr class="hr18">
+<div style="margin-top: 10em">
+    <hr class="hr18">
+<div id="container1" style="width: 550px;min-width:300px;height:400px;float: left"></div>
+<div id="container2" style="width: 550px;min-width:300px;height:400px;float: right"></div></div>
+</body>
+</html>
