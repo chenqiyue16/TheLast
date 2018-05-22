@@ -18,6 +18,9 @@ class CompanyInfo(models.Model):
     c_pic = models.ImageField(upload_to='zhizhao')
     c_shenhe = models.IntegerField(default=0)
 
+    def __str__(self):
+        return self.c_danweimingcheng
+
 
 class QianyueInfo(models.Model):
 

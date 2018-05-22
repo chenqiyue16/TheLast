@@ -99,6 +99,12 @@ def company_yaoyue(request):
 
 
 def company_yaoyue_handle(request):
+    url = 'http://v.juhe.cn/sms/send'
+    # 准备一下头
+    headers = {
+        'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
+    }
+
 
     qianyuegangwei = request.POST.get('qianyuegangwei')
     youxiaotianshu = request.POST.get('qianyuetianshu')
@@ -112,7 +118,7 @@ def company_yaoyue_handle(request):
     danganjieshou = request.POST.get('selectDangan', None)
     print(danganjieshou)
     print('???')
-    students = LinshiInfo.objects.all()
+    students = LinshiInfo.objects.filter(u_company_id=request.session.get('u_id'))
     for student in students:
         qianyue = QianyueInfo()
         qianyue.q_youxiaotianshu = youxiaotianshu
@@ -142,8 +148,21 @@ def company_yaoyue_handle(request):
         qianyue.q_student_id = student.u_id
         qianyue.q_company_id = request.session.get('u_id')
         qianyue.save()
+
+        values = {
+            'mobile': student.u_shouji,
+            'tpl_id': 68783,
+            'key': '0e9b1c796985a4c51cd563b0077fb8f0',
+        }
+        # 将字典格式化成能用的形式
+        data = urllib.parse.urlencode(values).encode('utf-8')
+        # 创建一个request,放入我们的地址、数据、头
+        rt = urllib.request.Request(url, data, headers)
+        html = urllib.request.urlopen(rt).read().decode('utf-8')
+        print(json.loads(html)['result'])
+        print(json.loads(html)['error_code'])
     LinshiInfo.objects.filter(u_company_id=request.session.get('u_id')).delete()
-    return redirect('/company/chakan/')
+    return HttpResponse('邀约成功！')
 
 
 class Express100(object):
@@ -383,6 +402,9 @@ def company_addstudent(request):
                         student.u_zhuanye = students[0].u_zhuanye
                         student.u_status = students[0].u_status
                         student.u_identyid = students[0].u_identyid
+                        student.u_shouji = students[0].u_shouji
+                        student.u_minzu = students[0].u_minzu
+                        student.u_sex = students[0].u_sex
                         student.u_company_id = str(id)
                         student.save()
                         return HttpResponse(json.dumps({"msg": '添加成功'}))
@@ -649,7 +671,12 @@ def company_chartstest(request):
     set = QianyueStudent.objects.values_list('u_nianji').annotate(Count('u_nianji')).filter(u_xueli='大学本科', u_company_id=u_id).order_by('u_nianji')
     set1 = QianyueStudent.objects.values_list('u_nianji').annotate(Count('u_nianji')).filter(u_xueli='硕士研究生', u_company_id=u_id).order_by('u_nianji')
     set2 = QianyueStudent.objects.distinct().values('u_nianji').order_by('u_nianji')
-
+    print('set')
+    print(set)
+    print('set1')
+    print(set1)
+    print('set2')
+    print(set2)
     benkelist = []
     benkenianjilist={}
     shuoshilist = []
@@ -667,8 +694,12 @@ def company_chartstest(request):
             shuoshilist.append(shuoshinianjilist[nianji])
         else:
             shuoshilist.append(0)
+    for l in benkenianjilist:
+        print(l)
+    print(benkenianjilist)
+    print(nianjilist)
     for nianji in nianjilist:
-        if nianji in nianjilist:
+        if nianji in benkenianjilist:
             benkelist.append(benkenianjilist[nianji])
         else:
             benkelist.append(0)

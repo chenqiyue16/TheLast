@@ -81,6 +81,12 @@
                             <i class="iconfont">&#xe6a7;</i>
                             <cite>查看邀约</cite>
                         </a>
+                    </li>
+                    <li>
+                        <a _href="/student/shujutongji/">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite>查看分布数据</cite>
+                        </a>
                     </li >
                     {% else %}
                     <li>
@@ -101,6 +107,12 @@
                             <cite>物流信息查看</cite>
                         </a>
                     </li >
+                    <li>
+                        <a _href="/student/shujutongji/">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite>查看分布数据</cite>
+                        </a>
+                    </li >
                     {% endif %}
 
                 </ul>
@@ -114,6 +126,7 @@
     <!-- 右侧主体开始 -->
     <div class="page-content">
         {% if u_status == "未签约" %}
+
         <div class="layui-tab tab" lay-filter="xbs_tab" lay-allowclose="false">
           <ul class="layui-tab-title">
             <li>我的邀约</li>

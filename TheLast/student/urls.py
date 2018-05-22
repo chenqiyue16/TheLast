@@ -13,4 +13,5 @@ urlpatterns = [
     url(r'^wuliuxinxiluru/$', views.student_wuliuxinxiluru),
     url(r'^wuliuxinxichakan/$', views.student_wuliuxinxichakan),
     url(r'^wuliuxinxibaocun/$', views.student_wuliuxinxibaocun),
+    url(r'^shujutongji/$', views.student_shujutongji),
     ]

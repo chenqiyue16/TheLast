@@ -4,6 +4,7 @@ from django.http import HttpResponse,HttpResponseRedirect
 from .models import *
 from company.models import CompanyInfo,QianyueInfo
 from django.core.paginator import Paginator
+from django.db.models.aggregates import Count
 import requests
 import importlib
 import urllib
@@ -11,6 +12,7 @@ import urllib.request
 import base64
 import hashlib
 import urllib.parse
+import json
 
 def index(request):
     student_id = request.session.get('student_id')
@@ -72,7 +74,7 @@ def student_chakanyaoyue(request, pIndex):
                                                                              'q_company_id__c_danweilishu', 'q_company_id__c_danweixingzhi',
                                                                              'q_company_id__c_danweihangye')
             if yaoyues:
-                p = Paginator(yaoyues, 1)
+                p = Paginator(yaoyues, 5)
                 if pIndex == '':
                     pIndex = 1
                 pIndex = int(pIndex)
@@ -109,6 +111,11 @@ def student_chakanxiangxixinxi(request, id):
 
 
 def student_jieshouyaoyue(request):
+    url = 'http://v.juhe.cn/sms/send'
+    # 准备一下头
+    headers = {
+        'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
+    }
     student_id = request.session.get('student_id')
     if student_id:
         company_id = request.POST.get('yaoyue_list')
@@ -129,7 +136,22 @@ def student_jieshouyaoyue(request):
         qianyuestudent.u_status = student.u_status
         qianyuestudent.u_company_id = c_id
         qianyuestudent.save()
-        return redirect('/student/index/')
+        company = CompanyInfo.objects.get(id=c_id)
+        values = {
+            'mobile': company.c_lianxidianhua,
+            'tpl_id': 68784,
+            'key': '0e9b1c796985a4c51cd563b0077fb8f0',
+        }
+        #print(qianyuestudent.u_company_id__c_lianxidianhua)
+        # 将字典格式化成能用的形式
+        data = urllib.parse.urlencode(values).encode('utf-8')
+        # 创建一个request,放入我们的地址、数据、头
+        rt = urllib.request.Request(url, data, headers)
+        html = urllib.request.urlopen(rt).read().decode('utf-8')
+        print(json.loads(html)['result'])
+        print(json.loads(html)['error_code'])
+
+        return HttpResponse('接收邀约成功')
         #return render(request, 'student/student_jieshouyaoyue.html')
     else:
         return redirect('/student/login/')
@@ -150,14 +172,12 @@ def student_qianyuexinxi(request):
 def student_wuliuxinxiluru(request):
     student_id = request.session.get('student_id')
     if student_id:
-        status = request.session.get('student_status')
+        status = QianyueStudent.objects.filter(u_id=student_id)[0].u_status
         if status == '已签约':
             qianyuestudents = QianyueStudent.objects.filter(u_id=student_id).values('u_company_id__c_danweimingcheng')
             qianyuestudent = qianyuestudents[0]
             context = {'qianyuestudent': qianyuestudent}
             return render(request, 'student/student_wuliuxinxiluru.html', context)
-        else:
-            return redirect('/student/index/')
     else:
         return redirect('/student/login/')
 
@@ -170,7 +190,7 @@ def student_wuliuxinxibaocun(request):
         kuaidi = request.POST.get('kuaidi1')
         print(company_name)
         QianyueInfo.objects.filter(q_company_id__c_danweimingcheng=company_name, q_student_id=student_id).update(q_stu_kuaidi=kuaidi)
-        return redirect('/student/wuliuxinxichakan/')
+        return HttpResponse('录入成功！')
     else:
         return redirect('/student/login/')
 
@@ -231,3 +251,37 @@ def student_wuliuxinxichakan(request):
             return render(request, 'student/student_chakanwuliuxinxi.html', context)
     else:
         return redirect('/student/login/')
+
+
+def student_shujutongji(request):
+    u_id = request.session.get('student_id')
+    diquset1 = QianyueStudent.objects.values_list('u_company_id__c_danweilishu').annotate(Count('u_company_id__c_danweilishu')).filter(u_xueli='大学本科')
+    diquset2 = QianyueStudent.objects.values_list('u_company_id__c_danweilishu').annotate(Count('u_company_id__c_danweilishu')).filter(u_xueli='硕士研究生')
+    student = QianyueStudent.objects.get(u_id=u_id)
+    zhuanye = student.u_zhuanye
+    name = student.u_name
+    print(zhuanye)
+    zhiweiset = QianyueInfo.objects.values_list('q_gangwei').annotate(Count('q_gangwei')).filter(q_student_id__u_zhuanye=zhuanye)
+    print(zhiweiset)
+    diquset1_dict = {}
+    diquset2_dict = {}
+    zhiwei_dict={}
+    sum = 0
+    for set1 in diquset1:
+        sum += set1[1]
+    for set1 in diquset1:
+        diquset1_dict[set1[0]] = (set1[1]*100)/sum
+    sum = 0
+    for set2 in diquset2:
+        sum += set2[1]
+    for set2 in diquset2:
+        diquset2_dict[set2[0]] = (set2[1]*100)/sum
+    sum = 0
+    for set3 in zhiweiset:
+        sum += set3[1]
+    for set3 in zhiweiset:
+        zhiwei_dict[set3[0]] = (set3[1]*100)/sum
+    print(diquset1_dict)
+    print(diquset2_dict)
+    context = {'diquset1_dict': diquset1_dict, 'diquset2_dict': diquset2_dict, 'zhiwei_dict': zhiwei_dict, 'name': name}
+    return render(request, 'student/student_shujutongji.html', context)
