@@ -1,10 +1,22 @@
 from django.shortcuts import render, redirect
 from .models import TeacherInfo
+from student.models import LinshiInfo, StudentInfo, QianyueStudent
 # Create your views here.
 from django.http import HttpResponse,HttpResponseRedirect
 from company.models import CompanyInfo
 from student.models import QianyueStudent
 from django.db.models.aggregates import Count
+from django.core.paginator import Paginator
+import json
+import urllib
+import urllib.request
+import base64
+import hashlib
+import urllib.parse
+from company.models import CompanyInfo,QianyueInfo
+from django.conf import settings
+import csv
+
 
 def index(request):
     user = request.session.get('teachername')
@@ -22,11 +34,11 @@ def login_handle(request):
     username = request.POST.get('username')
     pwd = request.POST.get('password')
     u_check = request.POST.get('checkout', 0)
-    print("uname::"+username)
+    #print("uname::"+username)
 
     teacher = TeacherInfo.objects.filter(t_username=username)
     pwd = TeacherInfo.objects.filter(t_username=username, t_pwd=pwd)
-    print(pwd)
+    #print(pwd)
     if teacher.exists():
         if pwd:
             red = HttpResponseRedirect('/teacher/index/')
@@ -40,22 +52,137 @@ def login_handle(request):
         return render(request, 'teacher/teacher_login.html', context)
 
 
-def teacher_shenhe(request):
+def teacher_shenhe(request, pIndex):
     company = CompanyInfo.objects.filter(c_shenhe=0)
-    context = {'companys': company}
+    p = Paginator(company, 5)
+    if pIndex == '':
+        pIndex = 1
+    pIndex = int(pIndex)
+    list2 = p.page(pIndex)
+    plist = p.page_range
+    context = {'plist': plist, 'companys': list2, 'p': pIndex}
     return render(request, 'teacher/teacher_shenhe.html', context)
 
 
 def teacher_shenhe_handle(request):
+    url = 'http://v.juhe.cn/sms/send'
+    # 准备一下头
+    headers = {
+        'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
+    }
     company_list = request.POST.getlist('company_list')
     shenhechenggong = 0
     if company_list:
         for id in company_list:
-            CompanyInfo.objects.filter(id=id).update(c_shenhe=1)
+            company = CompanyInfo.objects.get(id=id)
+            company.c_shenhe = 1
+            company.save()
             shenhechenggong = 1
+            values = {
+                'mobile': company.c_lianxidianhua,
+                'tpl_id': 68786,
+                'key': '0e9b1c796985a4c51cd563b0077fb8f0',
+            }
+            # 将字典格式化成能用的形式
+            data = urllib.parse.urlencode(values).encode('utf-8')
+            # 创建一个request,放入我们的地址、数据、头
+            rt = urllib.request.Request(url, data, headers)
+            html = urllib.request.urlopen(rt).read().decode('utf-8')
+            print(json.loads(html)['result'])
+            print(json.loads(html)['error_code'])
     company = CompanyInfo.objects.filter(c_shenhe=0)
     context = {'companys': company, 'shenhechenggong': shenhechenggong}
     return render(request, 'teacher/teacher_shenhe.html', context)
+
+
+def teacher_refuse_handle(request):
+    company_list = request.POST.get('company_list')
+    dianhua = request.POST.get('dianhua')
+    url = 'http://v.juhe.cn/sms/send'
+    # 准备一下头
+    headers = {
+        'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
+    }
+    values = {
+        'mobile': dianhua,
+        'tpl_id': 68787,
+        'key': '0e9b1c796985a4c51cd563b0077fb8f0',
+    }
+    # 将字典格式化成能用的形式
+    data = urllib.parse.urlencode(values).encode('utf-8')
+    # 创建一个request,放入我们的地址、数据、头
+    rt = urllib.request.Request(url, data, headers)
+    html = urllib.request.urlopen(rt).read().decode('utf-8')
+    print(json.loads(html)['result'])
+    print(json.loads(html)['error_code'])
+
+    if company_list:
+        CompanyInfo.objects.filter(id=company_list).update(c_shenhe=-1)
+    return HttpResponse(json.dumps({"msg": '拒绝成功'}))
+
+
+def teacher_chaxun_sousuo(request, pIndex):
+
+    queryset = {}
+    kwargs = {}
+
+    #print(id)
+    page = request.GET.get('page', None)
+    queryset['u_name'] = request.GET.get('u_name', None)
+    queryset['u_id'] = request.GET.get('u_id', None)
+    queryset['u_identyid'] = request.GET.get('u_identyid', None)
+    queryset['u_sex'] = request.GET.get('u_sex', None)
+    queryset['u_xueyuan'] = request.GET.get('u_xueyuan', None)
+    queryset['u_zhuanye'] = request.GET.get('u_zhuanye', None)
+    queryset['u_xueli'] = request.GET.get('u_xueli', None)
+    queryset['u_status'] = request.GET.get('u_qianyuezhuangtai', None)
+    for (k, v) in queryset.items():
+        if v != '':
+            kwargs[k] = v
+    #print(kwargs)
+    filepath = settings.MEDIA_ROOT + '/' + 'writer.csv'
+    students = StudentInfo.objects.filter(**kwargs).values('u_name', 'u_id', 'u_identyid', 'u_sex', 'u_xueyuan', 'u_zhuanye','u_nianji'
+                                                          , 'u_xueli', 'u_status')
+    if students:
+
+        file = open(filepath, 'w', encoding='utf-8', newline='')
+        writer = csv.writer(file)
+        writer.writerow(['姓名', '学号', '身份证号', '性别', '学院', '专业', '年级', '学历', '签约状态'])
+        for s in students:
+            writer.writerow([s['u_name'], s['u_id'], s['u_identyid'], s['u_sex'], s['u_xueyuan'], s['u_zhuanye'], s['u_nianji'], s['u_xueli'], s['u_status']])
+
+        p1 = Paginator(students, 5)
+        if page:
+            page = int(page)
+        else:
+            page = 1
+        list1 = p1.page(page)
+        plist = p1.page_range
+        context = {'plist': plist, 'tests': list1, 'pIndex': page}
+        return render(request, 'teacher/teacher_chaxun_sousuo.html', context)
+
+    else:
+        nostudents = 1
+        context = {'nostudents': nostudents}
+        return render(request, 'teacher/teacher_chaxun_sousuo.html', context)
+
+
+def teacher_chaxun(request, pIndex):
+
+    students = QianyueInfo.objects.filter().values('q_student_id', 'q_student_id__u_name',
+                                                                      'q_student_id__u_identyid'
+                                                                      , 'q_student_id__u_xueyuan', 'q_student_id__u_zhuanye'
+                                                                      , 'q_student_id__u_nianji', 'q_student_id__u_xueli'
+                                                                      , 'q_student_id__u_status', 'q_student_id__u_sex')
+    p = Paginator(students, 5)
+    if pIndex == '':
+        pIndex = 1
+    pIndex = int(pIndex)
+    list2 = p.page(pIndex)
+    plist = p.page_range
+    context = {'plist': plist, 'students': list2, 'pIndex': pIndex}
+    return render(request, 'teacher/teacher_chaxun.html', context)
+
 
 
 class DateTimeTest(object):
@@ -68,8 +195,7 @@ class DateTimeTest(object):
 
 def teacher_chartstest(request):
     students = QianyueStudent.objects.all()
-    for student in students:
-        print(student.u_date.month)
+
     benkeset = QianyueStudent.objects.values_list('u_date').annotate(Count('u_date')).filter(u_xueli='大学本科').order_by('u_date')
     shuoshiset = QianyueStudent.objects.values_list('u_date').annotate(Count('u_date')).filter(u_xueli='硕士研究生').order_by('u_date')
     datelist1 = []
@@ -80,11 +206,10 @@ def teacher_chartstest(request):
     for s in shuoshiset:
         date = DateTimeTest(s[0].year, s[0].month, s[0].day, s[1])
         datelist2.append(date)
-    for d in datelist1:
-        print(d.year, d.month, d.day, d.count)
+
     zhuanyeset1 = QianyueStudent.objects.values_list('u_zhuanye').annotate(Count('u_zhuanye')).filter(u_xueli='大学本科')
     zhuanyeset2 = QianyueStudent.objects.values_list('u_zhuanye').annotate(Count('u_zhuanye')).filter(u_xueli='硕士研究生')
-    print(zhuanyeset1)
+    #print(zhuanyeset1)
     zhuanyeset1_dict = {}
     zhuanyeset2_dict = {}
     sum = 0
@@ -97,7 +222,7 @@ def teacher_chartstest(request):
         sum += set2[1]
     for set2 in zhuanyeset2:
         zhuanyeset2_dict[set2[0]] = (set2[1]*100)/sum
-    print(zhuanyeset1_dict)
+    #print(zhuanyeset1_dict)
     context = {'datelist1': datelist1, 'datelist2': datelist2, 'zhuanyeset1_dict': zhuanyeset1_dict, 'zhuanyeset2_dict': zhuanyeset2_dict}
 
     return render(request, 'teacher/teacher_chartstest.html', context)

@@ -49,7 +49,7 @@
       <table class="layui-table">
         <thead>
           <tr>
-            <th style="text-align:center"><input style="width: 6em" onclick="shenhe()" value="审核"  class="layui-btn layui-btn-normal" lay-submit lay-filter="shenhe" ></th>
+            <th style="text-align:center"><input style="width: 5em" onclick="refuse()" value="拒绝"  class="layui-btn layui-btn-danger" lay-submit lay-filter="refuse" ><input style="width: 5em" onclick="shenhe()" value="通过"  class="layui-btn layui-btn-normal" lay-submit lay-filter="shenhe" ></th>
             <th style="text-align:center";>组织机构代码</th>
             <th  style="text-align:center">单位名称</th>
              <th  style="text-align:center">联系人</th>
@@ -69,7 +69,7 @@
                 <td align="center" >{{company.c_danweimingcheng}}</td>
                 <td align="center">{{company.c_lianxiren}}</td>
                 <td align="center">{{company.c_youxiang}}</td>
-                <td align="center">{{company.c_lianxidianhua}}</td>
+                <td align="center" id="lianxidianhua">{{company.c_lianxidianhua}}</td>
                 <td align="center">{{company.c_danweixingzhi}}</td>
                 <td align="center">{{company.c_danweihangye}}</td>
                 <td align="center">{{company.c_danweilishu}}</td>
@@ -87,21 +87,21 @@
       <div class="page">
         <div>
 
-            {% if students.has_previous%}
-            <a class="prev" href="/company/chaxun/{{students.previous_page_number}}/">&lt;&lt;</a>
+            {% if companys.has_previous%}
+            <a class="prev" href="/teacher/shenhe_{{companys..previous_page_number}}/">&lt;&lt;</a>
             {%endif%}
             {%for pindex in plist%}
 
-            {%if pindex == pIndex%}
+            {%if pindex == p%}
             <span class="current">{{pindex}}</span>
             {%else%}
-            <a class="num" href="/company/chaxun/{{pindex}}/">{{pindex}}</a>
+            <a class="num" href="/teacher/shenhe_{{pindex}}/">{{pindex}}</a>
             {% endif %}
             {%endfor%}
 
 
-            {% if students.has_next%}
-            <a class="next" href="/company/chaxun/{{students.next_page_number}}/">&gt;&gt;</a>
+            {% if companys.has_next%}
+            <a class="next" href="/teacher/shenhe_{{companys.next_page_number}}/">&gt;&gt;</a>
             {%endif%}
 
         </div>
@@ -114,7 +114,10 @@
 		var form = layui.form;
 		form.on('submit(shenhe)', function (data) {
             return false;
-        })
+        });
+		form.on('submit(refuse)', function (data) {
+            return false;
+        });
         });
        	function shenhe() {
 
@@ -127,6 +130,34 @@
             });
         }
 
+       	function refuse() {
+
+            layer.confirm('确认要对此公司进行拒绝吗？', {
+                btn: ['确认', '取消'] //按钮
+            }, function () {
+                var dianhua = document.getElementById('lianxidianhua').innerHTML;
+                check_val = '';
+                $.each($('input:checkbox:checked'),function(){
+
+                        check_val=$(this).val();
+                });
+                //alert(dianhua);
+                console.log(check_val);
+                $.ajax({
+				type:"POST",
+				url:"/teacher/refuse_handle/",
+				data:{dianhua:dianhua, company_list:check_val, csrfmiddlewaretoken: '{{ csrf_token  }}'},
+				dataType:"json",
+				success:function (data) {
+
+                    window.location.reload();
+                    alert(data.msg);
+            	}
+			});
+            }, function () {
+
+            });
+        }
 
         </script>
     <script>var _hmt = _hmt || []; (function() {

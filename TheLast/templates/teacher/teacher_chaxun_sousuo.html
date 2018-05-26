@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.0</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="/static/css/font.css">
+    <link rel="stylesheet" href="/static/css/xadmin.css">
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+      <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+      <script type="text/javascript">
+
+              nostudents = {{nostudents}}
+
+              if(nostudents == 1){
+                  alert('查询结果不存在！');
+              }
+
+
+
+
+
+
+
+      </script>
+  </head>
+
+  <body>
+    <div class="x-nav">
+      <span class="layui-breadcrumb">
+        <a href="">首页</a>
+        <a href="">演示</a>
+        <a>
+          <cite>导航元素</cite></a>
+      </span>
+      <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
+        <i class="layui-icon" style="line-height:30px">ဂ</i></a>
+    </div>
+    <div class="x-body">
+      <div class="layui-row">
+        <form class="layui-form layui-col-md12 x-so" action="/teacher/chaxun_sousuo/" method="get">
+          学生姓名：<input type="text" name="u_name"  placeholder="姓名查询" autocomplete="off" class="layui-input" style="margin-right: 5em">
+          学号：<input type="text" name="u_id"  placeholder="学号查询" autocomplete="off" class="layui-input" style="margin-right: 5em">
+          学院：<input type="text" name="u_xueyuan"  placeholder="学院查询" autocomplete="off" class="layui-input" style="margin-right: 5em">
+          <hr class="hr15">
+            {% csrf_token %}
+          身份证号：<input type="text" name="u_identyid"  placeholder="身份证号查询" autocomplete="off" class="layui-input" style="margin-right: 5em">
+          专业：<input type="text" name="u_zhuanye"  placeholder="专业查询" autocomplete="off" class="layui-input" style="margin-right: 5em">
+          学历：
+          <div style="margin-right: 5em" class="layui-input-inline">
+              <select name="u_xueli">
+                    <option></option>
+                    <option value="大学本科">大学本科</option>
+                    <option value="硕士研究生">硕士研究生</option>
+              </select>
+          </div>
+          <hr class="hr15">
+          签约状态：
+          <div style="margin-right: 5em" class="layui-input-inline">
+              <select name="u_qianyuezhuangtai">
+                    <option></option>
+                    <option value="1">已签约</option>
+                    <option value="0">未签约</option>
+
+              </select>
+          </div>
+            性别：
+          <div style="margin-right: 5em" class="layui-input-inline">
+              <select name="u_sex">
+                    <option></option>
+
+                    <option value="男">男</option>
+                    <option value="女">女</option>
+
+              </select>
+          </div>
+
+          <button class="layui-btn layui-btn-primary" lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i>查询</button>
+            <button class="layui-btn layui-btn-primary" lay-submit="" onclick="download()"><i class="layui-icon-download-circle">&#xe601;</i>下载数据</button>
+
+        </form>
+      </div>
+      <xblock>
+
+      </xblock>
+	<form class="layui-form" method="post" id="quxiao_form" action="/company/quxiaoyaoyue/">
+              {% csrf_token %}
+      <table class="layui-table">
+        <thead>
+          <tr>
+
+
+            <th style="text-align:center";>学号</th>
+            <th  style="text-align:center">姓名</th>
+             <th  style="text-align:center">身份证号</th>
+               <th  style="text-align:center">性别</th>
+            <th style="text-align:center">学院</th>
+            <th  style="text-align:center">专业</th>
+            <th style="text-align:center">年级</th>
+            <th style="text-align:center">学历</th>
+            <th style="text-align:center">状态</th>
+
+        </thead>
+        <tbody>
+
+        {% for student in tests%}
+          <tr>
+
+
+                <td align="center">{{student.u_id}}</td>
+                <td align="center" >{{student.u_name}}</td>
+                <td align="center">{{student.u_identyid}}</td>
+               <td align="center">{{student.u_sex}}</td>
+                <td align="center">{{student.u_xueyuan}}</td>
+                <td align="center">{{student.u_zhuanye}}</td>
+                <td align="center">{{student.u_nianji}}</td>
+                <td align="center">{{student.u_xueli}}</td>
+                <td align="center" class="td-status">
+
+                    {% if student.u_status == '未签约' %}
+                 <span class="layui-btn layui-btn-warm layui-btn-mini">未签约</span></td>
+                    {% endif %}
+                    {% if student.u_status == '已签约' %}
+                 <span class="layui-btn layui-btn layui-btn-mini">已签约</span></td>
+                    {% endif %}
+
+
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+
+        </form>
+      <div class="page">
+        <div>
+            {% if tests.has_previous%}
+            <a  id="pre" class="prev" href="javascript:fun_a()">&lt;&lt;</a>
+            {%endif%}
+            {%for pindex in plist%}
+
+            {%if pindex == pIndex%}
+            <span class="current">{{pindex}}</span>
+            {%else%}
+            <a id="ind" class="num" href="javascript:fun_b({{pindex}})">{{pindex}}</a>
+            {% endif %}
+            {%endfor%}
+
+
+            {% if tests.has_next%}
+            <a id="nex" class="next" href="javascript:fun_c()" >&gt;&gt;</a>
+            {%endif%}
+        </div>
+      </div>
+
+    </div>
+     </body>
+    <script>
+       function getUrl(){
+            var current_url = window.location.href;
+            var params = current_url.split('?');
+            var string = params[1].split('&');
+
+            var url =  params[0]+'?';
+            for(i=0;i<string.length;i++){
+                if(string[i].indexOf('page')==-1){
+                    url += string[i]+'&';
+                }
+            }
+            return url;
+        }
+
+          function download() {
+
+
+               window.open('/static/images/writer.csv');
+
+
+
+
+
+          }
+
+          function fun_a() {
+              {% if tests.has_previous%}
+              var t = {{tests.previous_page_number}};
+              var href = getUrl()+"page="+"{{tests.previous_page_number}}";
+              window.location.href= href;
+              {% endif %}
+          }
+
+
+          function fun_b(a) {
+              var href = getUrl()+"page="+a;
+              window.location.href= href;
+
+          }
+
+
+          function fun_c() {
+             {% if tests.has_next%}
+              var t = {{tests.next_page_number}};
+              var href = getUrl()+"page="+"{{tests.next_page_number}}";
+              window.location.href= href;
+              {% endif %}
+          }
+       	function quxiao() {
+            layer.confirm('确认要取消邀约吗？', {
+                btn: ['确认', '取消'] //按钮
+            }, function () {
+                $("#quxiao_form").submit();
+            }, function () {
+
+            });
+        }
+
+
+    </script>
+    <script>var _hmt = _hmt || []; (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?b393d153aeb26b46e9431fabaf0f6190";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+      })();</script>
+
+
+</html>

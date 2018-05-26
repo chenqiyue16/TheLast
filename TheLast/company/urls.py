@@ -38,5 +38,8 @@ urlpatterns = [
     url(r'^wuliuxinxichakan/(\d+)/$', views.company_wuliuxinxi_chakan),
     url(r'^wuliuxinxichakan_sousuo/$', views.company_wuliuxinxi_chakan_sousuo),
     url(r'^wuliuxinxichakan_xiangxixinxi_(\d+)/$', views.company_wuliuxinxi_chakan_xiangxixinxi),
-    url(r'chartstest', views.company_chartstest)
+    url(r'chartstest', views.company_chartstest),
+    url(r'^xiugaimima/$', views.company_xiugaimima),
+    url(r'^xiugaimima_handle/$', views.company_xiugaimima_handle),
+    url(r'^xiugaimima_check/$', views.company_xiugaimima_check),
 ]

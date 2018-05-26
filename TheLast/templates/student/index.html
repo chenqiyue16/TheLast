@@ -35,7 +35,7 @@
 <body>
     <!-- 顶部开始 -->
     <div class="container">
-        <div class="logo"><a href="./index.html">后台管理系统</a></div>
+        <div class="logo"><a href="./index.html">三方协议网签系统</a></div>
         <div class="left_open">
             <i title="展开左侧栏" class="iconfont">&#xe699;</i>
         </div>
@@ -51,14 +51,14 @@
         </ul>
         <ul class="layui-nav right" lay-filter="">
           <li class="layui-nav-item">
-            <a href="javascript:;">{{name}}</a>
+            <a href="javascript:;">{{u_name}}</a>
             <dl class="layui-nav-child"> <!-- 二级菜单 -->
-              <dd><a onclick="x_admin_show('个人信息','http://www.baidu.com')">个人信息{</a></dd>
+              <dd><a onclick="x_admin_show('修改密码','http://www.baidu.com')">修改密码</a></dd>
               <dd><a onclick="x_admin_show('切换帐号','http://www.baidu.com')">切换帐号</a></dd>
-              <dd><a href="./login.html">退出</a></dd>
+              <dd><a href="/student/tuichu/">退出</a></dd>
             </dl>
           </li>
-          <li class="layui-nav-item to-index"><a href="/">前台首页</a></li>
+          <li class="layui-nav-item to-index"><a href="/">首页</a></li>
         </ul>
         
     </div>
@@ -75,6 +75,13 @@
                     <i class="iconfont nav_right">&#xe697;</i>
                 </a>
                 <ul class="sub-menu">
+                    <li>
+                        <a _href="/student/xiugaimima">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite>修改密码</cite>
+                        </a>
+                    </li>
+
                     {% if u_status == "未签约" %}
                     <li>
                         <a _href="/student/chakanyaoyue_1">

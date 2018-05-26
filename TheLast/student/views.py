@@ -14,15 +14,56 @@ import hashlib
 import urllib.parse
 import json
 
+
+def student_tuichu(request):
+    request.session.clear()
+    return redirect('/student/login/')
+
+
 def index(request):
     student_id = request.session.get('student_id')
     if student_id:
         u_student = StudentInfo.objects.filter(u_id=student_id)
         u_status = u_student[0].u_status
-        context = {'u_status': u_status}
+        u_xueyuan = u_student[0].u_xueyuan
+        u_name = u_student[0].u_name
+        context = {'u_status': u_status, 'u_name': u_name, 'u_xueyuan': u_xueyuan}
         return render(request, 'student/index.html', context)
     else:
         return redirect('/student/login/')
+
+
+def student_xiugaimima(request):
+
+    return render(request, 'student/student_xiugaimima.html')
+
+
+def student_xiugaimima_handle(request):
+    yuanmima = request.POST.get('yuanmima')
+    u_id = request.session.get('student_id')
+    student = StudentInfo.objects.filter(u_id=u_id)[0]
+    #print(student)
+    if yuanmima == student.u_pwd:
+        #print('密码正确')
+        return HttpResponse(json.dumps({"msg": '密码正确'}))
+    else:
+        #print('密码错误')
+        return HttpResponse(json.dumps({"msg": '密码错误'}))
+
+
+def student_xiugaimima_check(request):
+    student_id = request.session.get('student_id')
+    mima1 = request.POST.get('xinmima')
+    mima2 = request.POST.get('xinmimaqueren')
+    if student_id:
+        if mima1 == mima2:
+            student = StudentInfo.objects.filter(u_id=student_id)[0]
+            student.u_pwd = mima1
+            student.save()
+            return HttpResponse(
+                '<script type="text/javascript">alert("修改成功！");parent.location.href="/student/login/";</script>')
+    else:
+        return HttpResponse('<script type="text/javascript">alert("没有登录，请先登录！");parent.location.href="/student/login/";</script>')
 
 
 def student_login(request):
@@ -80,13 +121,13 @@ def student_chakanyaoyue(request, pIndex):
                 pIndex = int(pIndex)
                 list2 = p.page(pIndex)
                 plist = p.page_range
-                context = {'plist': plist, 'yaoyues': list2, 'pindex': pIndex}
+                context = {'plist': plist, 'yaoyues': list2, 'pIndex': pIndex}
                 return render(request, 'student/student_chakanyaoyue.html', context)
             else:
 
                 return render(request, 'student/student_chakanyaoyue.html')
         else:
-            return HttpResponse('hello')
+            return HttpResponse('<script type="text/javascript">alert("你已接收邀约，不可重复查看！");parent.location.reload();</script>')
     else:
         return redirect('/company/login/')
 
@@ -151,7 +192,7 @@ def student_jieshouyaoyue(request):
         print(json.loads(html)['result'])
         print(json.loads(html)['error_code'])
 
-        return HttpResponse('接收邀约成功')
+        return HttpResponse('<script type="text/javascript">alert("接受邀约成功！！");parent.location.reload();</script>')
         #return render(request, 'student/student_jieshouyaoyue.html')
     else:
         return redirect('/student/login/')
@@ -257,7 +298,7 @@ def student_shujutongji(request):
     u_id = request.session.get('student_id')
     diquset1 = QianyueStudent.objects.values_list('u_company_id__c_danweilishu').annotate(Count('u_company_id__c_danweilishu')).filter(u_xueli='大学本科')
     diquset2 = QianyueStudent.objects.values_list('u_company_id__c_danweilishu').annotate(Count('u_company_id__c_danweilishu')).filter(u_xueli='硕士研究生')
-    student = QianyueStudent.objects.get(u_id=u_id)
+    student = StudentInfo.objects.get(u_id=u_id)
     zhuanye = student.u_zhuanye
     name = student.u_name
     print(zhuanye)

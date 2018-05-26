@@ -14,4 +14,8 @@ urlpatterns = [
     url(r'^wuliuxinxichakan/$', views.student_wuliuxinxichakan),
     url(r'^wuliuxinxibaocun/$', views.student_wuliuxinxibaocun),
     url(r'^shujutongji/$', views.student_shujutongji),
+    url(r'^xiugaimima/$', views.student_xiugaimima),
+    url(r'^xiugaimima_handle/$', views.student_xiugaimima_handle),
+    url(r'^xiugaimima_check/$', views.student_xiugaimima_check),
+    url(r'^tuichu/$', views.student_tuichu),
     ]

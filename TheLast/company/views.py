@@ -68,9 +68,49 @@ def login_handle(request):
         return render(request, 'company/company_login.html', context)
 
 
+def company_xiugaimima(request):
+    return render(request, 'company/company_xiugaimima.html')
+
+
+def company_xiugaimima_handle(request):
+    yuanmima = request.POST.get('yuanmima')
+    u_id = request.session.get('u_id')
+    company = CompanyInfo.objects.filter(id=u_id)[0]
+    s1 = sha1()
+    s1.update(yuanmima.encode("utf8"))
+    upwd_hash = s1.hexdigest()
+    #print(student)
+    if upwd_hash == company.c_password:
+        #print('密码正确')
+        return HttpResponse(json.dumps({"msg": '密码正确'}))
+    else:
+        #print('密码错误')
+        return HttpResponse(json.dumps({"msg": '密码错误'}))
+
+
+def company_xiugaimima_check(request):
+    company_id = request.session.get('u_id')
+    mima1 = request.POST.get('xinmima')
+    mima2 = request.POST.get('xinmimaqueren')
+    if company_id:
+        if mima1 == mima2:
+            company = CompanyInfo.objects.filter(id=company_id)[0]
+            s1 = sha1()
+            s1.update(mima1.encode("utf8"))
+            upwd_hash = s1.hexdigest()
+            company.c_password = upwd_hash
+            company.save()
+            return HttpResponse(
+                '<script type="text/javascript">alert("修改成功！");parent.location.href="/company/login/";</script>')
+    else:
+        return HttpResponse('<script type="text/javascript">alert("没有登录，请先登录！");parent.location.href="/student/login/";</script>')
+
+
 def company_index(request):
-    if request.session.get('u_id'):
-        if request.session.get('shenhe') == 1:
+    id = request.session.get('u_id')
+    if id:
+        company = CompanyInfo.objects.get(id=id)
+        if company.c_shenhe == 1:
             name = request.session.get('username')
             danweimingcheng = request.session.get('danweimingcheng')
             id = request.session.get('u_id')
@@ -325,14 +365,16 @@ def company_registerhandle(request):
 
 
 def company_weishenhe(request):
-    if request.session.get('shenhe') != 1:
+    id = request.session.get('u_id')
+    company = CompanyInfo.objects.get(id=id)
+    if company.c_shenhe != 1:
         id = request.session.get('u_id')
         companys = CompanyInfo.objects.filter(id=id)
         company = companys[0]
         context = {'company': company}
         return render(request, 'company/company_weishenhe.html', context)
     else:
-        return redirect('/company/index/')
+        return HttpResponse('<script type="text/javascript">alert("审核成功，即将跳转页面！");parent.location.href="/company/index/";</script>')
 
 
 def company_weishenhe_xiugai(request):
@@ -704,6 +746,8 @@ def company_chartstest(request):
         else:
             benkelist.append(0)
 
+
+
     zhuanyeset1 = QianyueStudent.objects.values_list('u_zhuanye').annotate(Count('u_zhuanye')).filter(u_xueli='大学本科', u_company_id=u_id)
     zhuanyeset2 = QianyueStudent.objects.values_list('u_zhuanye').annotate(Count('u_zhuanye')).filter(u_xueli='硕士研究生', u_company_id=u_id)
     print(zhuanyeset1)
@@ -720,5 +764,14 @@ def company_chartstest(request):
     for set2 in zhuanyeset2:
         zhuanyeset2_dict[set2[0]] = (set2[1]*100)/sum
     print(zhuanyeset1_dict)
-    context = {'nianjilist': nianjilist, 'benkelist': benkelist, 'shuoshilist': shuoshilist,'zhuanyeset1_dict': zhuanyeset1_dict, 'zhuanyeset2_dict': zhuanyeset2_dict}
+    agentmanlist1 = QianyueStudent.objects.filter(u_company_id=u_id,u_sex='男',u_xueli='大学本科')
+    agentmanlist2 = QianyueStudent.objects.filter(u_company_id=u_id, u_sex='男', u_xueli='硕士研究生')
+    agentwomanlist1 = QianyueStudent.objects.filter(u_company_id=u_id,u_sex='女',u_xueli='大学本科')
+    agentwomanlist2 = QianyueStudent.objects.filter(u_company_id=u_id, u_sex='女', u_xueli='硕士研究生')
+    benkeagentlist = [len(agentmanlist1),len(agentmanlist2)]
+    yanjiushengagentlist=[len(agentwomanlist1),len(agentwomanlist2)]
+    print(yanjiushengagentlist)
+    context = {'nianjilist': nianjilist, 'benkelist': benkelist, 'shuoshilist': shuoshilist,
+               'zhuanyeset1_dict': zhuanyeset1_dict, 'zhuanyeset2_dict': zhuanyeset2_dict,
+               'benkeagentlist': benkeagentlist, 'yanjiushengagentlist': yanjiushengagentlist}
     return render(request, 'company/company_chartstest.html', context)

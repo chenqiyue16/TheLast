@@ -35,7 +35,7 @@
 
 
         <div class="x-body">
-            <blockquote class="layui-elem-quote">欢迎使用武汉理工大学就业协议网签系统<div>{%if company.c_shenhe == 0%}当前状态：未审核{% endif%}{%if company.c_shenhe == 1%}当前状态：已审核{% endif%}</div></blockquote>
+            <blockquote class="layui-elem-quote">欢迎使用武汉理工大学就业协议网签系统<div>{%if company.c_shenhe == -1%}当前状态：审核不通过{% endif%}{%if company.c_shenhe == 0%}当前状态：未审核{% endif%}{%if company.c_shenhe == 1%}当前状态：已审核{% endif%}</div></blockquote>
             <fieldset class="layui-elem-field">
               <legend>基本信息</legend>
               <div class="layui-field-box">

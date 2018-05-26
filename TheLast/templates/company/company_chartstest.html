@@ -32,9 +32,7 @@
         },
         xAxis: {
             allowDecimals:false,
-            categories: [{% for nianji in nianjilist%}
-                            "{{nianji}}",
-                        {%endfor%}],
+            categories: ['本科生','研究生'],
             title: {
                 text: null
             }
@@ -76,15 +74,16 @@
             enabled: false
         },
         series: [{
-            name: '硕士',
-            data: [{%for s in shuoshilist%}
-                    {{s}},
-                  {%endfor%}]
+            name: '男',
+            data: [{% for nan in benkeagentlist %}
+                        {{nan}},
+                    {% endfor %}
+                ]
         }, {
-            name: '本科',
-            data: [{%for b in benkelist%}
-                    {{b}},
-                  {%endfor%}]
+            name: '女',
+            data: [{% for nv in yanjiushengagentlist %}
+                        {{nv}},
+                    {% endfor %}]
         }]
     });
 
